@@ -1,0 +1,13 @@
+<div class="cs-instant-purchase">
+    <!-- ko scope: 'instant-purchase' -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    <!-- /ko -->
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout();?>
+    }
+}
+</script>

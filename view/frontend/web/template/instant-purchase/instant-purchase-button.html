@@ -1,0 +1,13 @@
+<!-- ko if: showButton() -->
+<button type="button"
+        class="cs-instant-purchase-button"
+        data-bind="
+            click: createInstantPurchase,
+            attr: { title: text.createReorderButtonLabel }">
+
+    <span data-bind="text: text.createReorderButtonLabel"></span>
+    <!-- ko if: createReorderButtonIcon -->
+        <img class="inline-svg" data-bind="attr: { src: requirejs.toUrl(createReorderButtonIcon) }"/>
+    <!-- /ko -->
+</button>
+<!-- /ko -->

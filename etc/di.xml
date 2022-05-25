@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="\MageSuite\InstantPurchase\Service\QuoteItemsGenerator">
+        <arguments>
+            <argument name="strategiesPool" xsi:type="array">
+                <item name="use_order_items" xsi:type="object">MageSuite\InstantPurchase\Service\QuoteItemsGeneratorStrategy\UseOrderItems</item>
+                <item name="product" xsi:type="object">MageSuite\InstantPurchase\Service\QuoteItemsGeneratorStrategy\Product</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

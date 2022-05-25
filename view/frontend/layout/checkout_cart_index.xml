@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="checkout.cart.methods">
+            <block ifconfig="sales/instant_purchase/active" name="magesuite.instant.purchase.button" template="MageSuite_InstantPurchase::instant-purchase-button.phtml" after="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase" xsi:type="array">
+                                <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="formElementSelector" xsi:type="string">#form-validate</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="main.content">
+            <block name="magesuite.instant.purchase" template="MageSuite_InstantPurchase::instant-purchase.phtml" after="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase-button" xsi:type="array">
+                                <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase-button</item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

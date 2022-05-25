@@ -1,0 +1,194 @@
+<?php
+/** @var \Magento\Sales\Block\Order\History $block */
+/** @var \Magento\Sales\Block\Order\History $orders */
+/** @var \MageSuite\InstantPurchase\ViewModel\OrderItemRenderer $quoteItemRendererViewModel */
+$orders = $block->getOrders();
+$imageHelper = $this->helper(\Magento\Catalog\Helper\Image::class); // phpcs:ignore
+$quoteItemRendererViewModel = $block->getQuoteItemRendererViewModel();
+$initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
+?>
+
+<div class="cs-instant-purchase-form">
+    <?= $block->getChildHtml('info') ?>
+    <form id="instant_purchase" class="cs-instant-purchase-form__form cs-instant-purchase-form__form--locked" data-mage-init='{"instantPurchaseForm":"{}"}'>
+        <div class="cs-instant-purchase-form__actions cs-instant-purchase-form__actions--disabled">
+            <div class="cs-instant-purchase-form__action" data-bind="scope:'add-order-items-to-cart'">
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            </div>
+            <div class="cs-instant-purchase-form__action">
+                <?= $block->getChildHtml('magesuite.instant.purchase.button'); ?>
+            </div>
+        </div>
+        <?php if ($orders && count($orders)) : ?>
+            <div class="table-wrapper orders-history cs-instant-purchase-form__table-wrapper">
+                <table class="table-order-items history cs-instant-purchase-form__orders-table" id="my-orders-table">
+                    <caption><?= $escaper->escapeHtml(__('Orders')) ?></caption>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th scope="col" class="col id"><?= $escaper->escapeHtml(__('Order #')) ?></th>
+                            <th scope="col" class="col date"><?= $escaper->escapeHtml(__('Date')) ?></th>
+                            <?= $block->getChildHtml('extra.column.header') ?>
+                            <th scope="col" class="col total"><?= $escaper->escapeHtml(__('Order Total')) ?></th>
+                            <th scope="col" class="col status"><?= $escaper->escapeHtml(__('Status')) ?></th>
+                            <th colspan="3" scope="col" class="col actions"><?= $escaper->escapeHtml(__('Action')) ?></th>
+                        </tr>
+                    </thead>
+                    <?php /** @var $order \Magento\Sales\Model\Order */ ?>
+                    <?php
+                        $index = 0;
+                    foreach ($orders as $order) :
+                        ?>
+                        <tbody class="cs-instant-purchase-form__order<?= $index < $initiallyExpandedOrdersQty ? ' cs-instant-purchase-form__order--visible' : ''?>">
+                            <tr class="cs-instant-purchase-form__order-info">
+                            <?php
+                                $orderItems = $order->getAllVisibleItems();
+                                $orderItemsCount = count($orderItems);
+                            ?>
+                                <td class="cs-instant-purchase-form__table-side-cell" rowspan="<?= $orderItemsCount + 2?>">
+                                    <div class="field choice">
+                                        <input type="checkbox" class="checkbox cs-instant-purchase-form__order-checkbox">
+                                    </div>
+                                </td>
+                                <td data-th="<?= $escaper->escapeHtml(__('Order #')) ?>"
+                                    class="col id cs-instant-purchase-form__order-cell-id"><?= $escaper->escapeHtml($order->getRealOrderId()) ?></td>
+                                <td data-th="<?= $escaper->escapeHtml(__('Date')) ?>" class="col date"><?= /* @noEscape */
+                                $block->formatDate($order->getCreatedAt()) ?></td>
+                                <?php $extra = $block->getChildBlock('extra.container'); ?>
+                                <?php if ($extra) : ?>
+                                    <?php $extra->setOrder($order); ?>
+                                    <?= $extra->getChildHtml() ?>
+                                <?php endif; ?>
+                                <td data-th="<?= $escaper->escapeHtml(__('Order Total')) ?>" class="col total"><?= /* @noEscape */
+                                $order->formatPrice($order->getGrandTotal()) ?></td>
+                                <td data-th="<?= $escaper->escapeHtml(__('Status')) ?>"
+                                    class="col status"><?= $escaper->escapeHtml($order->getStatusLabel()) ?></td>
+                                <td colspan="2" class="col actions cs-instant-purchase-form__order-view">
+                                    <a href="<?= $block->escapeUrl($block->getViewUrl($order)) ?>" class="action view">
+                                        <span><?= $escaper->escapeHtml(__('View Order')) ?></span>
+                                    </a>
+                                </td>
+                                <td class="cs-instant-purchase-form__table-side-cell cs-instant-purchase-form__order-toggle">
+                                    <span class="cs-instant-purchase-form__order-toggle-text" data-th="<?= $escaper->escapeHtml(__('Ordered items')) ?>"><?= $escaper->escapeHtml(__('Show')) ?></span>
+                                    <div class="cs-instant-purchase-form__order-toggle-icon"></div>
+                                </td>
+                            </tr>
+                            <tr class="cs-instant-purchase-form__products-header">
+                                <th colspan="2" scope="col"><?= $escaper->escapeHtml(__('Product')) ?></th>
+                                <th scope="col"><?= $escaper->escapeHtml(__('Bought for')) ?></th>
+                                <th class="cs-instant-purchase-form__current-price-cell" scope="col"><?= $escaper->escapeHtml(__('Current price')) ?></th>
+                                <th colspan="2" scope="col"><?= $escaper->escapeHtml(__('Qty')) ?></th>
+                                <th class="cs-instant-purchase-form__table-side-cell" rowspan="<?= $escaper->escapeHtml($orderItemsCount + 1) ?>" ></th>
+                            </tr>
+                            <?php foreach ($orderItems as $orderItem) : ?>
+                            <tr class="cs-instant-purchase-form__order-product" data-current-price="<?= $escaper->escapeHtml($orderItem->getPriceInclTax()); ?>">
+                                <td class="cs-instant-purchase-form__product-cell-image">
+                                    <div class="field choice">
+                                        <input type="checkbox" class="checkbox cs-instant-purchase-form__product-checkbox" name="reorder_item[<?= /* @noEscape */ $orderItem->getId() ?>]" />
+                                    </div>
+                                    <?php
+                                    $renderer = $quoteItemRendererViewModel->setItem($orderItem);
+                                    $item = \Magento\Framework\App\ObjectManager::getInstance()->create(
+                                        \MageSuite\InstantPurchase\Model\OrderItemToConfigurableItemWrapper::class,
+                                        ['orderItem' => $orderItem]
+                                    );
+                                    $itemResolver = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Catalog\Model\Product\Configuration\Item\ItemResolverInterface::class);
+                                    $imageProduct = $itemResolver->getFinalProduct($item);
+
+                                    $product = $orderItem->getProduct();
+                                    $productImage = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
+                                    $productImageUrl = $block->escapeUrl($productImage->getUrl());
+                                    $productImage2x = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
+                                    $productImage2xUrl = $block->escapeUrl($productImage2x->getUrl());
+                                    ?>
+
+                                    <picture class="cs-instant-purchase-form__product-image">
+                                        <source
+                                            srcset="<?= /* @noEscape */ $productImageUrl . ' 1x, ' . $productImage2xUrl . ' 2x' ?>"
+                                        >
+                                        <img
+                                            src="<?= /* @noEscape */ $productImageUrl ?>"
+                                            srcset="<?= /* @noEscape */ $productImageUrl . ' 1x, ' . $productImage2xUrl . ' 2x' ?>"
+                                            loading="lazy"
+                                        >
+                                    </picture>
+                                </td>
+                                <td class="cs-instant-purchase-form__product-details-cell">
+                                    <div class="cs-instant-purchase-form__product-details">
+                                        <a class="cs-instant-purchase-form__product-name" href="<?= /* @noEscape */ $product->getProductUrl() ?>"><?= $escaper->escapeHtml($orderItem->getName()) ?></a>
+                                        <?php if ($options = $renderer->getItemOptions()) : ?>
+                                            <dl class="item-options">
+                                                <?php foreach ($options as $option) : ?>
+                                                    <dt><?= $escaper->escapeHtml($option['label']) ?></dt>
+                                                    <?php if (!$renderer->getPrintStatus()) : // phpcs:ignore ?>
+                                                        <?php $formatedOptionValue = $renderer->getFormatedOptionValue($option) ?>
+                                                        <dd<?= (isset($formatedOptionValue['full_view']) ? ' class="tooltip wrapper"' : '') ?>>
+                                                            <?= $escaper->escapeHtml($formatedOptionValue['value'], ['a']) ?>
+                                                            <?php if (isset($formatedOptionValue['full_view'])) : // phpcs:ignore ?>
+                                                                <div class="tooltip content">
+                                                                    <dl class="item options">
+                                                                        <dt><?= $escaper->escapeHtml($option['label']) ?></dt>
+                                                                        <dd><?= $escaper->escapeHtml($formatedOptionValue['full_view']) ?></dd>
+                                                                    </dl>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </dd>
+                                                    <?php else : ?>
+                                                        <?php $optionValue = isset($option['print_value']) ? $option['print_value'] : $option['value'] ?>
+                                                        <dd><?= $escaper->escapeHtml($optionValue) ?></dd>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </dl>
+                                        <?php endif; ?>
+                                        <?php $addtInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+                                        <?php if ($addtInfoBlock) : ?>
+                                            <?= $addtInfoBlock->setItem($orderItem)->toHtml() ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td class="cs-instant-purchase-form__product-cell-price" data-th="<?= $escaper->escapeHtml(__('Bought for')) ?>"><?= /* @noEscape */ $order->formatPrice($orderItem->getPriceInclTax()) ?></td>
+                                <td class="cs-instant-purchase-form__product-cell-price-current" data-th="<?= $escaper->escapeHtml(__('Current price')) ?>">
+                                    <?php
+                                    $priceRenderer = $block->getLayout()->getBlock('product.price.render.default');
+                                    $priceType = \Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE;
+                                    $arguments['zone'] = \Magento\Framework\Pricing\Render::ZONE_ITEM_LIST;
+                                    ?>
+                                    <?= /* @noEscape */  $priceRenderer->render($priceType, $product, $arguments) ?>
+                                </td>
+                                <td colspan="2" class="cs-instant-purchase-form__product-cell-qty">
+                                    <?= $block->getLayout()
+                                        ->createBlock(\Magento\Framework\View\Element\Template::class)
+                                        ->setInputName('qty[' . $orderItem->getId() . ']')
+                                        ->setInputSize(1)
+                                        ->setAdditionalInputCssClasses('cs-instant-purchase-form__product-qty-input')
+                                        ->setInputInitialValue((int)$orderItem->getQtyOrdered())
+                                        ->setDecrementIconUrl($block->getVar('qty_increment/icons/decrement', 'MageSuite_ThemeHelpers'))
+                                        ->setIncrementIconUrl($block->getVar('qty_increment/icons/increment', 'MageSuite_ThemeHelpers'))
+                                        ->setTemplate($block->getVar('qty_increment/template', 'MageSuite_ThemeHelpers'))
+                                        ->toHtml();
+                                    ?>
+                                </td>
+                            </tr>
+                                <?php $index++ ?>
+                            <?php endforeach; ?>
+                        </tbody>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+            <?php if ($block->getPagerHtml()) : ?>
+                <div class="order-products-toolbar toolbar bottom"><?= $block->getPagerHtml() ?></div>
+            <?php endif; ?>
+        <?php else : ?>
+            <div class="message info empty"><span><?= $escaper->escapeHtml($block->getEmptyOrdersMessage()) ?></span></div>
+        <?php endif; ?>
+        <input type="hidden" name="form_key" value="<?= /* @noEscape */ $block->getFormKey() ?>"/>
+    </form>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": <?= $block->getJsLayout(); ?>
+        }
+    }
+</script>

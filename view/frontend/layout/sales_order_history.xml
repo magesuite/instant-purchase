@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Replace default order history table with ours, that supports instant purchase solution -->
+        <referenceBlock name="sales.order.history">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">MageSuite_InstantPurchase::order/history.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="quote_item_renderer_view_model" xsi:type="object">MageSuite\InstantPurchase\ViewModel\OrderItemRenderer</argument>
+                <argument name="initially_expanded_orders_qty" xsi:type="number">3</argument>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="add-order-items-to-cart" xsi:type="array">
+                            <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/add-order-items-to-cart</item>
+                            <item name="config" xsi:type="array">
+                                <item name="template" xsi:type="string">MageSuite_InstantPurchase/instant-purchase/add-order-items-to-cart</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+
+            <block ifconfig="sales/instant_purchase/active" name="magesuite.instant.purchase.button" template="MageSuite_InstantPurchase::instant-purchase-button.phtml" after="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase-button" xsi:type="array">
+                                <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase-button</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">MageSuite_InstantPurchase/instant-purchase/instant-purchase-button</item>
+                                    <item name="createReorderButtonIcon" xsi:type="string">images/icons/arrow_next.svg</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+        <referenceBlock name="main.content">
+            <block ifconfig="sales/instant_purchase/active" name="magesuite.instant.purchase" template="MageSuite_InstantPurchase::instant-purchase.phtml" after="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase" xsi:type="array">
+                                <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="formElementSelector" xsi:type="string">#instant_purchase</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

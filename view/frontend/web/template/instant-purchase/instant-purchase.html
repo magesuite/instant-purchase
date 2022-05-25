@@ -1,0 +1,133 @@
+<!-- ko if: instantPurchaseAvailable() -->
+<div
+    class="cs-offcanvas cs-offcanvas--side_right cs-offcanvas--instant-purchase"
+    data-bind="mageInit: {
+        'mgsOffcanvas':{
+            'className': 'cs-offcanvas--instant-purchase',
+            'closeButtonClassName': 'cs-instant-purchase__close',
+            'offcanvasShowTriggerEvent': 'instantPurchaseOffcanvasShow',
+            'offcanvasHideTriggerEvent': 'instantPurchaseOffcanvasHide'
+    }}
+">
+    <div class="cs-offcanvas__overlay overlay"></div>
+    <div class="cs-offcanvas__drawer drawer">
+        <div class="cs-instant-purchase">
+            <div class="cs-instant-purchase__title-wrapper">
+                <div class="cs-instant-purchase__close" data-action="close" data-bind="attr: { title: $t('Close') }">
+                    <span class="cs-instant-purchase__close-icon"></span>
+                </div>
+                <span class="cs-instant-purchase__title" data-bind="text: text.offcanvasTitle"></span>
+            </div>
+
+            <if args="quoteData()">
+                <div class="cs-instant-purchase__products">
+                    <!-- ko foreach: { data: quoteData().items, as: 'item' } -->
+                    <div class="cs-instant-purchase__product">
+                        <picture>
+                            <source data-bind="attr: {srcset: item.product.image_url}">
+                            <img class="cs-instant-purchase__product-image" data-bind="attr: {src: item.product.image_url, srcset: item.product.image_url}">
+                        </picture>
+                        <div class="cs-instant-purchase__product-details">
+                            <div class="cs-instant-purchase__product-name" data-bind="text: item.name"></div>
+                            <div class="cs-instant-purchase__product-price" data-bind="text: $parent.formatPrice(item.row_total_incl_tax)"></div>
+                            <div class="cs-instant-purchase__product-qty">
+                                <span class="cs-instant-purchase__product-qty-label" data-bind="text: $parent.text.qtyLabel"></span>
+                                <span data-bind="text: item.qty"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+
+                <div class="cs-instant-purchase__summary">
+                    <div class="cs-instant-purchase__totals">
+                        <span class="cs-instant-purchase__totals-text" data-bind="text: text.totalsLabel"></span>
+                        <span class="cs-instant-purchase__totals-amount"data-bind="text: formatPrice(getTotals().base_grand_total)"></span>
+                    </div>
+                    <div
+                        class="cs-instant-purchase__order-details"
+                        data-bind="css: {'cs-instant-purchase__order-details--show': showOrderDetails()}">
+
+                        <div
+                            class="cs-instant-purchase__order-details-toggle"
+                            data-bind="
+                                click: toggleOrderDetails,
+                                i18n: showOrderDetails() ? $t(text.hideOrderDetails) : $t(text.showOrderDetails)">
+                        </div>
+                        <div class="cs-instant-purchase__order-details-box">
+                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Shipping Address:'"></span>
+                            <select
+                                class="cs-select"
+                                name="shipping_address_id"
+                                data-bind="
+                                    foreach: { data: getAllAddresses(), as: 'address' },
+                                    event:{ change: handleShippingAddressChange }
+                                ">
+                                <option data-bind="
+                                    attr: {
+                                        'selected': address.entity_id === $parent.selectedShippingAddressId() ? 'selected' : null
+                                    },
+                                    text: address.firstname + ' ' + address.lastname + ', ' + address.street + ', ' + address.city + ' ' + address.postcode + ' ' + address.country_id,
+                                    value: address.entity_id
+                                ">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="cs-instant-purchase__order-details-box">
+                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Billing Address:'"></span>
+                            <select
+                                class="cs-select"
+                                name="billing_address_id"
+                                data-bind="
+                                    foreach: { data: getAllAddresses(), as: 'address' },
+                                    event:{ change: handleBillingAddressChange }
+                                ">
+                                <option
+                                    data-bind="
+                                        attr: {
+                                            'selected': address.entity_id === $parent.selectedBillingAddressId() ? 'selected' : null
+                                        },
+                                        text: address.firstname + ' ' + address.lastname + ', ' + address.street + ', ' + address.city + ' ' + address.postcode + ' ' + address.country_id,
+                                        value: address.entity_id
+                                ">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="cs-instant-purchase__order-details-box">
+                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Shipping method:'"></span>
+                            <select
+                                class="cs-select"
+                                name="shipping_method"
+                                data-bind="
+                                    foreach: { data: availableShippingMethods(), as: 'shippingMethod' },
+                                    event:{ change: handleShippingMethodChange }
+                                ">
+                                <option
+                                    data-bind="
+                                        attr: {
+                                            'selected': $parent.formatShippingMethodValue(shippingMethod) === $parent.selectedShippingMethodValue() ? 'selected' : null
+                                        },
+                                        text: `${shippingMethod.carrier_title} - ${shippingMethod.method_title} - ${$parent.formatPrice(shippingMethod.price_incl_tax)}`,
+                                        value: $parent.formatShippingMethodValue(shippingMethod)
+                                ">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="cs-instant-purchase__actions">
+                    <button
+                        type="button"
+                        class="cs-instant-purchase__place-order"
+                        data-bind="attr: { title: $t(text.placeOrderButtonLabel) }, click: placeOrder">
+                        <span data-bind="text: text.placeOrderButtonLabel"></span>
+                        <!-- ko if: placeOrderButtonIcon -->
+                            <img class="inline-svg cs-minicart__button-checkout-icon" data-bind="attr: { src: requirejs.toUrl(placeOrderButtonIcon) }"/>
+                        <!-- /ko -->
+                    </button>
+                </div>
+            </if>
+        </div>
+    </div>
+</div>
+<!-- /ko -->
