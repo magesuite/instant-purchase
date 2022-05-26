@@ -52,7 +52,7 @@ define([
                 instantPurchaseModel.setFormElement($formElement);
             }
 
-            customerData.reload(['instant-purchase'], true);
+            // customerData.reload(['instant-purchase'], true);
 
             this.toggleOrderDetails = this.toggleOrderDetails.bind(this);
             this.handleShippingMethodChange = this.handleShippingMethodChange.bind(this);
