@@ -20,8 +20,8 @@ define([
         availableShippingMethods = ko.observableArray([]),
         purchaseCustomerData = customerData.get('instant-purchase');
 
-    // Sets initial data based on customerData
-    purchaseCustomerData.subscribe(({available, paymentToken, shippingAddress, billingAddress}) => {
+    // Sets initial data based on customerData and subscribe to changes
+    const setInstantPurchaseData = ({available, paymentToken, shippingAddress, billingAddress}) => {
         if (available) {
             instantPurchaseAvailable(available);
         }
@@ -39,7 +39,9 @@ define([
             defaultBillingAddressId(billingAddress.id)
             selectedBillingAddressId(billingAddress.id)
         }
-    });
+    };
+    setInstantPurchaseData(purchaseCustomerData());
+    purchaseCustomerData.subscribe(setInstantPurchaseData);
 
     // Set data based on instant purchase quote when it gets created or reloaded
     quoteData.subscribe(({quote, shippingMethods}) => {
