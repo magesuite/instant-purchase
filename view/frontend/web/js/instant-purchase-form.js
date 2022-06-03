@@ -4,7 +4,9 @@ define([
 ], function ($) {
     $.widget('magesuite.instantPurchaseForm', {
         options: {
-            baseClass: 'cs-instant-purchase-form'
+            baseClass: 'cs-instant-purchase-form',
+            toggleTextShow: $.mage.__('Show'),
+            toggleTextHide: $.mage.__('Hide'),
         },
         _create: function() {
             this.options = {
@@ -17,6 +19,7 @@ define([
                     orderCheckboxClass: `${this.options.baseClass}__order-checkbox`,
                     productCheckboxClass: `${this.options.baseClass}__product-checkbox`,
                     orderToggleClass: `${this.options.baseClass}__order-toggle`,
+                    orderToggleTextClass: `${this.options.baseClass}__order-toggle-text`,
                     actionsWrapperClass: `${this.options.baseClass}__actions`,
                     actionsDisabledClass: `${this.options.baseClass}__actions--disabled`,
                 },
@@ -40,9 +43,13 @@ define([
         },
 
         /**
-         * Handles click on order row.
+         * Handles click on order row (excluding other clickable elements).
          */
         orderInfoRowClickHandler: function(event) {
+            if ($(event.target).is(`input, label, a`)) {
+                return;
+            }
+
             $(event.currentTarget).find(`.${this.options.orderToggleClass}`).first().trigger('click');
         },
 
@@ -51,11 +58,16 @@ define([
          */
         orderToggleHandler: function(event) {
             event.stopPropagation();
+            const
+                $target = $(event.currentTarget),
+                $text = $target.find(`.${this.options.orderToggleTextClass}`),
+                $order = $target.closest(`.${this.options.orderBodyClass}`);
 
-            const $order = $(event.currentTarget).closest(`.${this.options.orderBodyClass}`);
             if ($order.hasClass(this.options.orderVisibleClass)) {
                 $order.removeClass(this.options.orderVisibleClass)
+                $text.text(this.options.toggleTextShow);
             } else {
+                $text.text(this.options.toggleTextHide);
                 $order.addClass(this.options.orderVisibleClass)
             }
         },

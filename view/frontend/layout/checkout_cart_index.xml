@@ -11,6 +11,15 @@
                                 <item name="config" xsi:type="array">
                                     <item name="formElementSelector" xsi:type="string">#form-validate</item>
                                 </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="instant-purchase-products" xsi:type="array">
+                                        <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase-products</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">MageSuite_InstantPurchase/instant-purchase/instant-purchase-products</item>
+                                        </item>
+                                        <item name="displayArea" xsi:type="string">products</item>
+                                    </item>
+                                </item>
                             </item>
                         </item>
                     </argument>

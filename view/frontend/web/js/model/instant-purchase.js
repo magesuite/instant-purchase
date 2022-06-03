@@ -10,15 +10,19 @@ define([
     const
         formElement = ko.observable(null),
         quoteData = ko.observable(null),
+        quoteId = ko.observable(null),
+        quoteItems = ko.observable(null),
+        quoteTotals = ko.observable(null),
+        purchaseCustomerData = customerData.get('instant-purchase'),
         instantPurchaseAvailable = ko.observable(null),
         customerPaymentToken = ko.observable(null),
-        selectedShippingMethodValue = ko.observable(null),
-        selectedBillingAddressId = ko.observable(null),
-        selectedShippingAddressId = ko.observable(null),
         defaultBillingAddressId = ko.observable(null),
         defaultShippingAddressId = ko.observable(null),
         availableShippingMethods = ko.observableArray([]),
-        purchaseCustomerData = customerData.get('instant-purchase');
+        selectedShippingMethod = ko.observable(null),
+        customerAddresses = ko.observableArray([]),
+        selectedBillingAddress = ko.observable(null),
+        selectedShippingAddress = ko.observable(null);
 
     // Sets initial data based on customerData and subscribe to changes
     const setInstantPurchaseData = ({available, paymentToken, shippingAddress, billingAddress}) => {
@@ -32,51 +36,71 @@ define([
 
         if (shippingAddress?.id) {
             defaultShippingAddressId(shippingAddress.id)
-            selectedShippingAddressId(shippingAddress.id);
         }
 
         if (billingAddress?.id) {
             defaultBillingAddressId(billingAddress.id)
-            selectedBillingAddressId(billingAddress.id)
         }
     };
     setInstantPurchaseData(purchaseCustomerData());
     purchaseCustomerData.subscribe(setInstantPurchaseData);
 
     // Set data based on instant purchase quote when it gets created or reloaded
-    quoteData.subscribe(({quote, shippingMethods}) => {
-        if (shippingMethods) {
-            availableShippingMethods(shippingMethods)
-        };
+    quoteData.subscribe(({items, totals, quote, shippingMethods, addresses}) => {
+        if (!items || !totals || !quote || !shippingMethods || !addresses) {
+            return;
+        }
+
+        if (items) { quoteItems(items) };
+        if (totals) { quoteTotals(totals) };
+        if (shippingMethods) { availableShippingMethods(shippingMethods) };
+        if (addresses) { customerAddresses(addresses) };
 
         const {
+            id,
             shipping_carrier_code,
             shipping_method_code,
             shipping_address,
-            billing_address
+            billing_address,
         } = quote;
 
-        if (shipping_address?.id) {
-            selectedShippingAddressId(shipping_address.id);
-        }
-
-        if (billing_address?.id) {
-            selectedBillingAddressId(billing_address.id);
-        }
+        if (id) { quoteId(id) };
 
         if (shipping_carrier_code && shipping_method_code) {
-            selectedShippingMethodValue(`${shipping_carrier_code}|${shipping_method_code}`);
-        }
+            const shippingMethod = availableShippingMethods().find(method => {
+                return method.carrier_code == shipping_carrier_code && method.method_code == shipping_method_code
+            });
+            selectedShippingMethod(shippingMethod)
+        };
+
+        if (shipping_address?.customer_address_id) {
+            const shippingAddress = customerAddresses()?.find(item => (
+                item.entity_id == shipping_address.customer_address_id
+            )) || null;
+
+            selectedShippingAddress(shippingAddress);
+        };
+
+        if (billing_address?.customer_address_id) {
+            const billingAddress = customerAddresses()?.find(item => (
+                item.entity_id == billing_address.customer_address_id
+            )) || null;
+
+            selectedBillingAddress(billingAddress);
+        };
     });
 
     return {
-        quoteData,
+        quoteId,
+        quoteItems,
+        quoteTotals,
         instantPurchaseAvailable,
         customerPaymentToken,
         availableShippingMethods,
-        selectedShippingAddressId,
-        selectedBillingAddressId,
-        selectedShippingMethodValue,
+        selectedShippingMethod,
+        selectedShippingAddress,
+        selectedBillingAddress,
+        customerAddresses,
 
         /**
          * Returns serialized form data
@@ -109,14 +133,10 @@ define([
                 });
             }
 
-            if (useDefault) {
-                this.restoreDefaultData();
-            }
-
             const
-                shippingAddressId = selectedShippingAddressId(),
-                billingAddressId = selectedBillingAddressId(),
-                shippingMethodValue = selectedShippingMethodValue();
+                shippingAddressId = useDefault ? defaultShippingAddressId() : selectedShippingAddress()?.entity_id,
+                billingAddressId = useDefault ? defaultBillingAddressId() : selectedBillingAddress()?.entity_id,
+                shippingMethod = useDefault ? null : selectedShippingMethod();
 
             if (shippingAddressId) {
                 formData.push({
@@ -132,38 +152,22 @@ define([
                 });
             }
 
-            if (shippingMethodValue) {
-                const [carrierCode, shippingMethod] = shippingMethodValue.split('|');
+            if (shippingMethod) {
+                const { carrier_code, method_code } = shippingMethod;
 
-                if (carrierCode && shippingMethod) {
+                if (carrier_code && method_code) {
                     formData.push({
                         name: 'instant_purchase_carrier',
-                        value: carrierCode
+                        value: carrier_code
                     });
                     formData.push({
                         name: 'instant_purchase_shipping',
-                        value: shippingMethod
+                        value: method_code
                     });
                 }
             }
 
             return formData;
-        },
-
-        /**
-         * Restores default shipping & addresses values for instant purchase
-         */
-        restoreDefaultData: function() {
-            const
-                billingAddressId = defaultBillingAddressId(),
-                shippingAddressId = defaultShippingAddressId();
-
-            if (billingAddressId && shippingAddressId) {
-                selectedBillingAddressId(billingAddressId);
-                selectedShippingAddressId(shippingAddressId);
-            }
-
-            selectedShippingMethodValue(null);
         },
 
         /**
@@ -183,40 +187,7 @@ define([
          * @return {String}
          */
         formatPrice: function(price) {
-            return priceUtils.formatPrice(price, this.quoteData().basePriceFormat);
-        },
-
-        /**
-         * Sets shipping method value observable
-         *
-         * @param {String} shippingMethodValue
-         */
-        setShippingMethodValue: function (shippingMethodValue) {
-            if (shippingMethodValue) {
-                selectedShippingMethodValue(shippingMethodValue)
-            }
-        },
-
-        /**
-         * Sets shipping address Id observable
-         *
-         * @param {String} shippingAddressId
-         */
-        setShippingAddressId: function (shippingAddressId) {
-            if (shippingAddressId) {
-                selectedShippingAddressId(shippingAddressId)
-            }
-        },
-
-        /**
-         * Sets billing address Id observable
-         *
-         * @param {String} billingAddressId
-         */
-        setBillingAddressId: function (billingAddressId) {
-            if (billingAddressId) {
-                selectedBillingAddressId(billingAddressId)
-            }
+            return priceUtils.formatPrice(price, quoteData().basePriceFormat);
         },
 
         /**

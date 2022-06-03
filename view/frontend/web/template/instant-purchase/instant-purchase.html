@@ -19,31 +19,20 @@
                 <span class="cs-instant-purchase__title" data-bind="text: text.offcanvasTitle"></span>
             </div>
 
-            <if args="quoteData()">
+            <if args="quoteItems()">
                 <div class="cs-instant-purchase__products">
-                    <!-- ko foreach: { data: quoteData().items, as: 'item' } -->
-                    <div class="cs-instant-purchase__product">
-                        <picture>
-                            <source data-bind="attr: {srcset: item.product.image_url}">
-                            <img class="cs-instant-purchase__product-image" data-bind="attr: {src: item.product.image_url, srcset: item.product.image_url}">
-                        </picture>
-                        <div class="cs-instant-purchase__product-details">
-                            <div class="cs-instant-purchase__product-name" data-bind="text: item.name"></div>
-                            <div class="cs-instant-purchase__product-price" data-bind="text: $parent.formatPrice(item.row_total_incl_tax)"></div>
-                            <div class="cs-instant-purchase__product-qty">
-                                <span class="cs-instant-purchase__product-qty-label" data-bind="text: $parent.text.qtyLabel"></span>
-                                <span data-bind="text: item.qty"></span>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- ko foreach: getRegion('products') -->
+                        <!-- ko template: getTemplate() --><!-- /ko -->
                     <!-- /ko -->
                 </div>
 
                 <div class="cs-instant-purchase__summary">
-                    <div class="cs-instant-purchase__totals">
-                        <span class="cs-instant-purchase__totals-text" data-bind="text: text.totalsLabel"></span>
-                        <span class="cs-instant-purchase__totals-amount"data-bind="text: formatPrice(getTotals().base_grand_total)"></span>
-                    </div>
+                    <if args="quoteTotals()">
+                        <div class="cs-instant-purchase__totals">
+                            <span class="cs-instant-purchase__totals-text" data-bind="i18n: text.totalsLabel"></span>
+                            <span class="cs-instant-purchase__totals-amount"data-bind="text: formatPrice(quoteTotals().base_grand_total)"></span>
+                        </div>
+                    </if>
                     <div
                         class="cs-instant-purchase__order-details"
                         data-bind="css: {'cs-instant-purchase__order-details--show': showOrderDetails()}">
@@ -54,64 +43,50 @@
                                 click: toggleOrderDetails,
                                 i18n: showOrderDetails() ? $t(text.hideOrderDetails) : $t(text.showOrderDetails)">
                         </div>
+
+
                         <div class="cs-instant-purchase__order-details-box">
-                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Shipping Address:'"></span>
+                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Shipping address'"></span>
                             <select
                                 class="cs-select"
-                                name="shipping_address_id"
+                                name="shipping_address"
                                 data-bind="
-                                    foreach: { data: getAllAddresses(), as: 'address' },
-                                    event:{ change: handleShippingAddressChange }
+                                    event:{ change: (obj, event) => handleSelectChange(event, selectedShippingAddress) },
+                                    value: selectedShippingAddress,
+                                    options: customerAddresses(),
+                                    optionsText: (address) => formatAddressLabel(address)
                                 ">
-                                <option data-bind="
-                                    attr: {
-                                        'selected': address.entity_id === $parent.selectedShippingAddressId() ? 'selected' : null
-                                    },
-                                    text: address.firstname + ' ' + address.lastname + ', ' + address.street + ', ' + address.city + ' ' + address.postcode + ' ' + address.country_id,
-                                    value: address.entity_id
-                                ">
-                                </option>
                             </select>
                         </div>
                         <div class="cs-instant-purchase__order-details-box">
-                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Billing Address:'"></span>
+                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Billing address'"></span>
                             <select
                                 class="cs-select"
-                                name="billing_address_id"
+                                name="billing_address"
                                 data-bind="
-                                    foreach: { data: getAllAddresses(), as: 'address' },
-                                    event:{ change: handleBillingAddressChange }
+                                    event:{ change: (obj, event) => handleSelectChange(event, selectedBillingAddress) },
+                                    value: selectedBillingAddress,
+                                    options: customerAddresses(),
+                                    optionsText: (address) => formatAddressLabel(address)
                                 ">
-                                <option
-                                    data-bind="
-                                        attr: {
-                                            'selected': address.entity_id === $parent.selectedBillingAddressId() ? 'selected' : null
-                                        },
-                                        text: address.firstname + ' ' + address.lastname + ', ' + address.street + ', ' + address.city + ' ' + address.postcode + ' ' + address.country_id,
-                                        value: address.entity_id
-                                ">
-                                </option>
                             </select>
                         </div>
                         <div class="cs-instant-purchase__order-details-box">
-                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Shipping method:'"></span>
+                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Shipping method'"></span>
                             <select
                                 class="cs-select"
                                 name="shipping_method"
                                 data-bind="
-                                    foreach: { data: availableShippingMethods(), as: 'shippingMethod' },
-                                    event:{ change: handleShippingMethodChange }
+                                    event:{ change: (obj, event) => handleSelectChange(event, selectedShippingMethod) },
+                                    value: selectedShippingMethod,
+                                    options: availableShippingMethods(),
+                                    optionsText: (shippingMethod) => formatShippingMethodLabel(shippingMethod)
                                 ">
-                                <option
-                                    data-bind="
-                                        attr: {
-                                            'selected': $parent.formatShippingMethodValue(shippingMethod) === $parent.selectedShippingMethodValue() ? 'selected' : null
-                                        },
-                                        text: `${shippingMethod.carrier_title} - ${shippingMethod.method_title} - ${$parent.formatPrice(shippingMethod.price_incl_tax)}`,
-                                        value: $parent.formatShippingMethodValue(shippingMethod)
-                                ">
-                                </option>
                             </select>
+                        </div>
+                        <div class="cs-instant-purchase__order-details-box">
+                            <span class="cs-instant-purchase__order-details-label" data-bind="i18n: 'Payment method'"></span>
+                            <div class="cs-instant-purchase__order-details-text" data-bind="i18n: 'Last used Credit Card'"></div>
                         </div>
                     </div>
                 </div>

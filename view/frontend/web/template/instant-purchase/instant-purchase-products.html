@@ -1,0 +1,16 @@
+<!-- ko foreach: { data: quoteItems(), as: 'item' } -->
+<div class="cs-instant-purchase__product">
+    <picture class="cs-instant-purchase__product-picture">
+        <source data-bind="attr: {srcset: item.product.image_url}">
+        <img class="cs-instant-purchase__product-image" data-bind="attr: {src: item.product.image_url, srcset: item.product.image_url}">
+    </picture>
+    <div class="cs-instant-purchase__product-details">
+        <div class="cs-instant-purchase__product-name" data-bind="text: item.name"></div>
+        <div class="cs-instant-purchase__product-price" data-bind="text: $parent.formatPrice(item.row_total_incl_tax)"></div>
+        <div class="cs-instant-purchase__product-qty">
+            <span class="cs-instant-purchase__product-qty-label" data-bind="text: $parent.text.qtyLabel"></span>
+            <span data-bind="text: item.qty"></span>
+        </div>
+    </div>
+</div>
+<!-- /ko -->
