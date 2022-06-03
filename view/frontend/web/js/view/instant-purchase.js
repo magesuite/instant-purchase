@@ -24,21 +24,22 @@ define([
             text: {
                 offcanvasTitle: $.mage.__('Instant purchase'),
                 placeOrderButtonLabel: $.mage.__('Buy now'),
-                totalsLabel: $.mage.__('Order total'),
-                qtyLabel: $.mage.__('Qty'),
+                totalsLabel: $.mage.__('Order Total'),
                 showOrderDetails: $.mage.__('Show details'),
                 hideOrderDetails: $.mage.__('Hide details'),
             },
             placeOrderButtonIcon: 'images/icons/arrow_next.svg',
         },
         instantPurchaseAvailable: instantPurchaseModel.instantPurchaseAvailable,
-        availableShippingMethods: instantPurchaseModel.availableShippingMethods,
-        selectedShippingMethodValue: instantPurchaseModel.selectedShippingMethodValue,
-        selectedShippingAddressId: instantPurchaseModel.selectedShippingAddressId,
-        selectedBillingAddressId: instantPurchaseModel.selectedBillingAddressId,
-        quoteData: instantPurchaseModel.quoteData,
+        quoteItems: instantPurchaseModel.quoteItems,
+        quoteTotals: instantPurchaseModel.quoteTotals,
         formatPrice: instantPurchaseModel.formatPrice,
         showOrderDetails: ko.observable(false),
+        customerAddresses: instantPurchaseModel.customerAddresses,
+        selectedShippingAddress: instantPurchaseModel.selectedShippingAddress,
+        selectedBillingAddress: instantPurchaseModel.selectedBillingAddress,
+        availableShippingMethods: instantPurchaseModel.availableShippingMethods,
+        selectedShippingMethod: instantPurchaseModel.selectedShippingMethod,
 
         initialize: function() {
             this._super();
@@ -52,38 +53,10 @@ define([
                 instantPurchaseModel.setFormElement($formElement);
             }
 
-            // customerData.reload(['instant-purchase'], true);
-
             this.toggleOrderDetails = this.toggleOrderDetails.bind(this);
-            this.handleShippingMethodChange = this.handleShippingMethodChange.bind(this);
-            this.handleBillingAddressChange = this.handleBillingAddressChange.bind(this);
-            this.handleShippingAddressChange = this.handleShippingAddressChange.bind(this);
-        },
-
-        /**
-         * Pulls array with available customer addresses from quote.
-         *
-         * @return {Array}
-         */
-        getAllAddresses: function() {
-            return this.quoteData()?.addresses || null;
-        },
-
-        /**
-         * Returns current shipping method in a format required by BE enpoint
-         * to be used in shipping method select as a value.
-         *
-         * @return {Array}
-         */
-        getCurrentShippingMethodFormattedValue() {
-            const carrierCode = this.quoteData()?.quote?.shipping_carrier_code;
-            const methodCode = this.quoteData()?.quote?.shipping_method_code;
-
-            if (!carrierCode || !methodCode) {
-                return null;
-            }
-
-            return `${carrierCode}|${methodCode}`
+            this.handleSelectChange = this.handleSelectChange.bind(this);
+            this.formatShippingMethodLabel = this.formatShippingMethodLabel.bind(this);
+            this.formatAddressLabel = this.formatAddressLabel.bind(this);
         },
 
         /**
@@ -94,66 +67,43 @@ define([
         },
 
         /**
-         * Returns shipping method in a format to be used in shipping method select as a value.
+         * Returns shipping method string in a format to be used as a label.
          *
          * @param {Object} shippingMehod
          * @return {String}
          */
-        formatShippingMethodValue(shippingMethod) {
-            if (!shippingMethod) {
-                return null;
-            }
-
-            return `${shippingMethod.carrier_code}|${shippingMethod.method_code}`;
+        formatShippingMethodLabel({carrier_title, method_title, price_incl_tax}) {
+            return `${carrier_title} - ${method_title} - ${this.formatPrice(price_incl_tax)}`
         },
 
         /**
-         * Sets shipping method value on elect element change and reloads quote.
-         * Works only if event was triggered by the user.
+         * Returns address in a format to be used as a label.
+         *
+         * @param {Object} address
+         * @return {String}
+         */
+        formatAddressLabel({firstname, lastname, street, city, postcode, country_id }) {
+            return `${firstname}, ${lastname}, ${street}, ${city}, ${postcode}, ${country_id}`;
+        },
+
+        /**
+         * Method to be used in as select change event handler,
+         * which reloads the quote when value changes changes.
+         * It uses the subscription workaround,
+         * because the change event itself gets the old value instead of new one.
+         * We subscribe to the related value model, and after we handle it, we cancel a subscription.
+         * Original event check assures user interaction.
          *
          * @param {Event} event
+         * @param {Event} valueModel - same model we pass to select as value binding
          */
-        handleShippingMethodChange: function(obj, event) {
+        handleSelectChange: function(event, valueModel) {
             if (event.originalEvent) {
-                instantPurchaseModel.setShippingMethodValue(event.currentTarget.value);
-                this.reloadQuote();
+                const subscription = valueModel.subscribe(() => {
+                    this.reloadQuote();
+                    subscription.dispose();
+                })
             }
-        },
-
-        /**
-         * Sets billing address id on elect element change and reloads quote.
-         * Works only if event was triggered by the user.
-         *
-         * @param {Event} event
-         */
-        handleBillingAddressChange: function(obj, event) {
-            if (event.originalEvent) {
-                instantPurchaseModel.setBillingAddressId(event.currentTarget.value);
-                this.reloadQuote();
-            }
-        },
-
-        /**
-         * Sets shipping address id on elect element change and reloads quote.
-         * Works only if event was triggered by the user.
-         *
-         * @param {Event} event
-         */
-        handleShippingAddressChange: function(obj, event) {
-            if (event.originalEvent) {
-                instantPurchaseModel.setShippingAddressId(event.currentTarget.value);
-                this.reloadQuote();
-            }
-
-        },
-
-        /**
-         * Pulls order totals object from quote.
-         *
-         * @return {Object} event
-         */
-        getTotals: function () {
-            return this.quoteData()?.totals || null;
         },
 
         /**

@@ -16,8 +16,7 @@ define([
      * @return {(jqXHR|Deferred)}
      */
     return function () {
-        const quoteData = instantPurchaseModel.quoteData();
-        const quoteId = quoteData?.quote?.id;
+        const quoteId = instantPurchaseModel.quoteId();
 
         if (!quoteId) {
             return $.Deferred().reject();

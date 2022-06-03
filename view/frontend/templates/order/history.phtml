@@ -45,9 +45,12 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                 $orderItems = $order->getAllVisibleItems();
                                 $orderItemsCount = count($orderItems);
                             ?>
-                                <td class="cs-instant-purchase-form__table-side-cell" rowspan="<?= $orderItemsCount + 2?>">
+                                <td rowspan="<?= $orderItemsCount + 2?>"
+                                    class="cs-instant-purchase-form__table-side-cell cs-instant-purchase-form__order-cell-checkbox">
                                     <div class="field choice">
-                                        <input type="checkbox" class="checkbox cs-instant-purchase-form__order-checkbox">
+                                        <label for="order-checkbox-<?= $index ?>" class="cs-instant-purchase-form__order-checkbox-label">
+                                            <input id="order-checkbox-<?= $index ?>" type="checkbox" class="checkbox cs-instant-purchase-form__order-checkbox">
+                                        </label>
                                     </div>
                                 </td>
                                 <td data-th="<?= $escaper->escapeHtml(__('Order #')) ?>"
@@ -65,11 +68,13 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                     class="col status"><?= $escaper->escapeHtml($order->getStatusLabel()) ?></td>
                                 <td colspan="2" class="col actions cs-instant-purchase-form__order-view">
                                     <a href="<?= $block->escapeUrl($block->getViewUrl($order)) ?>" class="action view">
-                                        <span><?= $escaper->escapeHtml(__('View Order')) ?></span>
+                                        <?= $escaper->escapeHtml(__('View Order')) ?>
                                     </a>
                                 </td>
                                 <td class="cs-instant-purchase-form__table-side-cell cs-instant-purchase-form__order-toggle">
-                                    <span class="cs-instant-purchase-form__order-toggle-text" data-th="<?= $escaper->escapeHtml(__('Ordered items')) ?>"><?= $escaper->escapeHtml(__('Show')) ?></span>
+                                    <span class="cs-instant-purchase-form__order-toggle-text" data-th="<?= $escaper->escapeHtml(__('Ordered items')) ?>">
+                                        <?= $index < $initiallyExpandedOrdersQty ? $escaper->escapeHtml(__('Hide')) : $escaper->escapeHtml(__('Show')) ?>
+                                    </span>
                                     <div class="cs-instant-purchase-form__order-toggle-icon"></div>
                                 </td>
                             </tr>
@@ -83,8 +88,11 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                             <?php foreach ($orderItems as $orderItem) : ?>
                             <tr class="cs-instant-purchase-form__order-product" data-current-price="<?= $escaper->escapeHtml($orderItem->getPriceInclTax()); ?>">
                                 <td class="cs-instant-purchase-form__product-cell-image">
+                                    <?php $orderItemId = $orderItem->getId(); ?>
                                     <div class="field choice">
-                                        <input type="checkbox" class="checkbox cs-instant-purchase-form__product-checkbox" name="reorder_item[<?= /* @noEscape */ $orderItem->getId() ?>]" />
+                                        <label class="cs-instant-purchase-form__product-checkbox-label" for="reorder_item[<?= /* @noEscape */ $orderItemId ?>]">
+                                            <input id="reorder_item[<?= /* @noEscape */ $orderItemId ?>]" name="reorder_item[<?= /* @noEscape */ $orderItemId ?>]" type="checkbox" class="checkbox cs-instant-purchase-form__product-checkbox" />
+                                        </label>
                                     </div>
                                     <?php
                                     $renderer = $quoteItemRendererViewModel->setItem($orderItem);
@@ -161,6 +169,7 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                         ->setInputName('qty[' . $orderItem->getId() . ']')
                                         ->setInputSize(1)
                                         ->setAdditionalInputCssClasses('cs-instant-purchase-form__product-qty-input')
+                                        ->setInputAdditionalParams('data-min-value="1" min="1"')
                                         ->setInputInitialValue((int)$orderItem->getQtyOrdered())
                                         ->setDecrementIconUrl($block->getVar('qty_increment/icons/decrement', 'MageSuite_ThemeHelpers'))
                                         ->setIncrementIconUrl($block->getVar('qty_increment/icons/increment', 'MageSuite_ThemeHelpers'))
