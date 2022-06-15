@@ -9,6 +9,7 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
     protected \Magento\Sales\Api\OrderRepositoryInterface $orderRepository;
     protected \Magento\Customer\Model\Session $customerSession;
     protected \Psr\Log\LoggerInterface $logger;
+    protected \MageSuite\InstantPurchase\Model\ResourceModel\QuoteCleaner $quoteCleaner;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -16,6 +17,7 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
         \Magento\Quote\Model\QuoteRepository $quoteRepository,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\InstantPurchase\Model\QuoteManagement\Purchase $purchase,
+        \MageSuite\InstantPurchase\Model\ResourceModel\QuoteCleaner $quoteCleaner,
         \Psr\Log\LoggerInterface $logger
     ) {
         parent::__construct($context);
@@ -25,6 +27,7 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
         $this->purchase = $purchase;
         $this->quoteRepository = $quoteRepository;
         $this->logger = $logger;
+        $this->quoteCleaner = $quoteCleaner;
     }
 
     /**
@@ -47,6 +50,8 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
             }
 
             $orderId = $this->purchase->purchase($quote);
+
+            $this->quoteCleaner->cleanInstantPurchaseQuotes($customer->getId());
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             $this->logger->error(sprintf('Error when trying to buy using instant purchase %s', $e->getMessage()));
 

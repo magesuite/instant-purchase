@@ -60,6 +60,8 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
             $this->addItemToCart($orderItem, $quote, $orderItem->getProduct(), $itemIds[$orderItem->getId()]);
         }
 
+        $quote->setInstantPurchaseOrigin('order_history');
+
         return $quote;
     }
 

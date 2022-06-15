@@ -3,4 +3,9 @@
     <action name="instant_purchase/cart/add">
         <section name="cart" />
     </action>
+
+    <action name="instant_purchase/purchase/instant">
+        <section name="instant-purchase" />
+        <section name="cart" />
+    </action>
 </config>

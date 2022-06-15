@@ -36,6 +36,8 @@ class Product implements \MageSuite\InstantPurchase\Api\Service\QuoteItemsGenera
 
         $productRequest = $this->getRequestUnknownParams($params);
 
+        $quote->setInstantPurchaseOrigin('pdp');
+
         $this->quoteFilling->fillQuote(
             $quote,
             $product,
