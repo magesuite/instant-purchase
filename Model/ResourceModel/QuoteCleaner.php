@@ -13,11 +13,11 @@ class QuoteCleaner
 
     public function cleanLeftoverInstantPurchaseQuotes($customerId)
     {
-        if(!is_numeric($customerId)) {
+        if (!is_numeric($customerId)) {
             return;
         }
 
-        if($customerId <= 0) {
+        if ($customerId <= 0) {
             return;
         }
 

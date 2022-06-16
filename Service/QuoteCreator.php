@@ -15,8 +15,7 @@ class QuoteCreator
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \MageSuite\InstantPurchase\Model\ResourceModel\QuoteCleaner $quoteCleaner
-    )
-    {
+    ) {
         $this->quoteFactory = $quoteFactory;
         $this->checkoutSession = $checkoutSession;
         $this->quoteCleaner = $quoteCleaner;
@@ -28,8 +27,7 @@ class QuoteCreator
         \Magento\Customer\Model\Customer $customer,
         \Magento\Customer\Model\Address $shippingAddress,
         \Magento\Customer\Model\Address $billingAddress
-    )
-    {
+    ) {
         $this->quoteCleaner->cleanLeftoverInstantPurchaseQuotes($customer->getId());
 
         $quote = isset($params['cart']) ?
