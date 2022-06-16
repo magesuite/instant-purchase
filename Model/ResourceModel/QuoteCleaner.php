@@ -11,7 +11,7 @@ class QuoteCleaner
         $this->connection = $resourceConnection->getConnection();
     }
 
-    public function cleanInstantPurchaseQuotes($customerId)
+    public function cleanLeftoverInstantPurchaseQuotes($customerId)
     {
         if(!is_numeric($customerId)) {
             return;

@@ -51,7 +51,7 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
 
             $orderId = $this->purchase->purchase($quote);
 
-            $this->quoteCleaner->cleanInstantPurchaseQuotes($customer->getId());
+            $this->quoteCleaner->cleanLeftoverInstantPurchaseQuotes($customer->getId());
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             $this->logger->error(sprintf('Error when trying to buy using instant purchase %s', $e->getMessage()));
 
