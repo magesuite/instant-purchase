@@ -48,8 +48,8 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                 <td rowspan="<?= $orderItemsCount + 2?>"
                                     class="cs-instant-purchase-form__table-side-cell cs-instant-purchase-form__order-cell-checkbox">
                                     <div class="field choice">
-                                        <label for="order-checkbox-<?= $index ?>" class="cs-instant-purchase-form__order-checkbox-label">
-                                            <input id="order-checkbox-<?= $index ?>" type="checkbox" class="checkbox cs-instant-purchase-form__order-checkbox">
+                                        <label for="order-checkbox-<?= /* @noEscape */$index ?>" class="cs-instant-purchase-form__order-checkbox-label">
+                                            <input id="order-checkbox-<?= /* @noEscape */ $index ?>" type="checkbox" class="checkbox cs-instant-purchase-form__order-checkbox">
                                         </label>
                                     </div>
                                 </td>
