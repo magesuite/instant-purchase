@@ -1,10 +1,12 @@
 define([
     'jquery',
+    'mage/translate',
     'uiComponent',
     'MageSuite_InstantPurchase/js/model/instant-purchase',
     'MageSuite_InstantPurchase/js/action/instant-purchase-create'
 ], function (
     $,
+    $t,
     Component,
     instantPurchaseModel,
     createInstantPurchase

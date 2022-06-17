@@ -12,6 +12,11 @@
                         <item name="components" xsi:type="array">
                             <item name="instant-purchase-button" xsi:type="array">
                                 <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase-button</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="text" xsi:type="array">
+                                        <item name="createReorderButtonLabel" xsi:type="string" translate="true">Buy now</item>
+                                    </item>
+                                </item>
                             </item>
                         </item>
                     </argument>

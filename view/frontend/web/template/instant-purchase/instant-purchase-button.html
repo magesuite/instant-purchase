@@ -3,9 +3,9 @@
         class="cs-instant-purchase-button"
         data-bind="
             click: createInstantPurchase,
-            attr: { title: text.createReorderButtonLabel }">
+            attr: { title: $t(text.createReorderButtonLabel) }">
 
-    <span data-bind="text: text.createReorderButtonLabel"></span>
+    <span data-bind="i18n: text.createReorderButtonLabel"></span>
     <!-- ko if: createReorderButtonIcon -->
         <img class="inline-svg" data-bind="attr: { src: requirejs.toUrl(createReorderButtonIcon) }"/>
     <!-- /ko -->
