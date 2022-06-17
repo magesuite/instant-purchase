@@ -27,6 +27,7 @@ define([
                 totalsLabel: $.mage.__('Order Total'),
                 showOrderDetails: $.mage.__('Show details'),
                 hideOrderDetails: $.mage.__('Hide details'),
+                defaultPaymentMethodName: $.mage.__('Last used Credit Card'),
             },
             placeOrderButtonIcon: 'images/icons/arrow_next.svg',
         },

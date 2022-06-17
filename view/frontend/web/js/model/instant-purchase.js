@@ -1,8 +1,10 @@
 define([
+    'jquery',
     'ko',
     'Magento_Customer/js/customer-data',
     'Magento_Catalog/js/price-utils',
 ], function (
+    $,
     ko,
     customerData,
     priceUtils
@@ -44,6 +46,10 @@ define([
     };
     setInstantPurchaseData(purchaseCustomerData());
     purchaseCustomerData.subscribe(setInstantPurchaseData);
+
+    if ($.isEmptyObject(purchaseCustomerData())) {
+        customerData.reload(['instant-purchase'], true);
+    }
 
     // Set data based on instant purchase quote when it gets created or reloaded
     quoteData.subscribe(({items, totals, quote, shippingMethods, addresses}) => {

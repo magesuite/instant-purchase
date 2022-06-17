@@ -1,15 +1,17 @@
-"Add selected to cart","Add selected to cart"
-"Billing address","Rechnungsadresse"
-"Bought for","Kaufen für"
-"Buy now","Buy now"
-"Current price","Aktueller Preis"
-"Hide details","Details verbergen"
-"Hide","Verbergen"
-"Instant purchase","Instant purchase"
-"Items were successfully added to cart","Items were successfully added to cart"
-"Payment method","Zahlungsart"
-"Rebuy now","Rebuy now"
-"Shipping address","Lieferadresse"
-"Shipping method","Versandart"
-"Show details","Details anzeigen"
-"Show","Anzeigen"
+"Add selected to cart","In den Warenkorb",MageSuite_InstantPurchase
+"Billing address","Rechnungsadresse",MageSuite_InstantPurchase
+"Bought for","Alter Preis",MageSuite_InstantPurchase
+"Buy now","Jetzt kaufen",MageSuite_InstantPurchase
+"Current price","Aktueller Preis",MageSuite_InstantPurchase
+"Hide details","Details verstecken",MageSuite_InstantPurchase
+"Hide","Verstecken",MageSuite_InstantPurchase
+"Instant purchase","1-Klick Kauf",MageSuite_InstantPurchase
+"Items were successfully added to cart","Produkte wurden in den Warenkorb gelegt",MageSuite_InstantPurchase
+"Last used Credit Card","Zuletzt genutzte Kreditkarte",MageSuite_InstantPurchase
+"Order Total","Gesamtbetrag",MageSuite_InstantPurchase
+"Payment method","Zahlungsart",MageSuite_InstantPurchase
+"Rebuy now","Rebuy nutzen",MageSuite_InstantPurchase
+"Shipping address","Lieferadresse",MageSuite_InstantPurchase
+"Shipping method","Versandart",MageSuite_InstantPurchase
+"Show details","Details zeigen",MageSuite_InstantPurchase
+"Show","Zeigen",MageSuite_InstantPurchase
