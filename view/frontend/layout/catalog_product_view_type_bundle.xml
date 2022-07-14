@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.addtocart.bundle">
+            <block ifconfig="sales/instant_purchase/active" name="magesuite.instant.purchase.button" template="MageSuite_InstantPurchase::instant-purchase-button.phtml" as="form_bottom" before="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase-button" xsi:type="array">
+                                <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase-button</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="text" xsi:type="array">
+                                        <item name="createReorderButtonLabel" xsi:type="string" translate="true">Buy now</item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="main.content">
+            <block ifconfig="sales/instant_purchase/active" name="magesuite.instant.purchase" template="MageSuite_InstantPurchase::instant-purchase.phtml" after="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase" xsi:type="array">
+                                <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="formElementSelector" xsi:type="string">#product_addtocart_form</item>
+                                </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="instant-purchase-products" xsi:type="array">
+                                        <item name="component" xsi:type="string">MageSuite_InstantPurchase/js/view/instant-purchase-products</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">MageSuite_InstantPurchase/instant-purchase/instant-purchase-products</item>
+                                        </item>
+                                        <item name="displayArea" xsi:type="string">products</item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

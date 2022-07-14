@@ -1,0 +1,19 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:MageSuite_Changelog:etc/changelog.xsd">
+    <module id="MageSuite_InstantPurchase" name="MageSuite_InstantPurchase">
+        <changelog>
+            <tag version="1.0.0" date="2022-06-17">
+                <entry>
+                    <type>INIT</type>
+                    <overview>Initial release</overview>
+                </entry>
+            </tag>
+            <tag version="1.0.1" date="2022-07-13">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Fixed issue with bundle product page</overview>
+                    <ticket_id>MGS-4635</ticket_id>
+                </entry>
+            </tag>
+        </changelog>
+    </module>
+</config>
