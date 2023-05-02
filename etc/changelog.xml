@@ -21,6 +21,12 @@
                     <ticket_id>MGS-4567</ticket_id>
                 </entry>
             </tag>
+            <tag version="1.0.3" date="2023-05-02">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Replace deprecated jquery Promise handlers</overview>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>

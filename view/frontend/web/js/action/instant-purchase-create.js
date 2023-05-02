@@ -42,7 +42,7 @@ define([
             }
         }).always(function () {
             $(document.body).trigger('processStop');
-        }).success(quoteSummaryData => {
+        }).done(quoteSummaryData => {
             instantPurchaseModel.setQuoteData(quoteSummaryData);
             return quoteSummaryData;
         })
