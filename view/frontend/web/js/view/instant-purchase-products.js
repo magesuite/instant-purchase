@@ -18,4 +18,3 @@ define([
         formatPrice: instantPurchaseModel.formatPrice
     });
 });
-
