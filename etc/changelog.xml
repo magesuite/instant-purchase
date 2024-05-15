@@ -27,6 +27,13 @@
                     <overview>Replace deprecated jquery Promise handlers</overview>
                 </entry>
             </tag>
+            <tag version="1.0.4" date="2024-05-15">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Skip rendering product when it is no longer available</overview>
+                    <ticket_id>P2G-2182</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
