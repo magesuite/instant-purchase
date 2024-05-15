@@ -88,27 +88,36 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                             <?php foreach ($orderItems as $orderItem) : ?>
                             <tr class="cs-instant-purchase-form__order-product" data-current-price="<?= $escaper->escapeHtml($orderItem->getPriceInclTax()); ?>">
                                 <td class="cs-instant-purchase-form__product-cell-image">
-                                    <?php $orderItemId = $orderItem->getId(); ?>
-                                    <div class="field choice">
-                                        <label class="cs-instant-purchase-form__product-checkbox-label" for="reorder_item[<?= /* @noEscape */ $orderItemId ?>]">
-                                            <input id="reorder_item[<?= /* @noEscape */ $orderItemId ?>]" name="reorder_item[<?= /* @noEscape */ $orderItemId ?>]" type="checkbox" class="checkbox cs-instant-purchase-form__product-checkbox" />
-                                        </label>
-                                    </div>
                                     <?php
                                     $renderer = $quoteItemRendererViewModel->setItem($orderItem);
                                     $item = \Magento\Framework\App\ObjectManager::getInstance()->create(
                                         \MageSuite\InstantPurchase\Model\OrderItemToConfigurableItemWrapper::class,
                                         ['orderItem' => $orderItem]
                                     );
-                                    $itemResolver = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Catalog\Model\Product\Configuration\Item\ItemResolverInterface::class);
-                                    $imageProduct = $itemResolver->getFinalProduct($item);
-
                                     $product = $orderItem->getProduct();
-                                    $productImage = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
-                                    $productImageUrl = $block->escapeUrl($productImage->getUrl());
-                                    $productImage2x = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
-                                    $productImage2xUrl = $block->escapeUrl($productImage2x->getUrl());
+                                    $productExists = $product ?: false;
+
+                                    if ($productExists) {
+                                        $itemResolver = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Catalog\Model\Product\Configuration\Item\ItemResolverInterface::class);
+                                        $imageProduct = $itemResolver->getFinalProduct($item);
+                                        $productImage = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
+                                        $productImageUrl = $block->escapeUrl($productImage->getUrl());
+                                        $productImage2x = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
+                                        $productImage2xUrl = $block->escapeUrl($productImage2x->getUrl());
+                                    } else {
+                                        $productImageUrl = '';
+                                        $productImage2xUrl = '';
+                                    }
                                     ?>
+
+                                    <?php $orderItemId = $orderItem->getId(); ?>
+                                    <?php if ($productExists) : ?>
+                                    <div class="field choice">
+                                        <label class="cs-instant-purchase-form__product-checkbox-label" for="reorder_item[<?= /* @noEscape */ $orderItemId ?>]">
+                                            <input id="reorder_item[<?= /* @noEscape */ $orderItemId ?>]" name="reorder_item[<?= /* @noEscape */ $orderItemId ?>]" type="checkbox" class="checkbox cs-instant-purchase-form__product-checkbox" />
+                                        </label>
+                                    </div>
+                                    <?php endif; ?>
 
                                     <picture class="cs-instant-purchase-form__product-image">
                                         <source
@@ -121,6 +130,7 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                         >
                                     </picture>
                                 </td>
+                                <?php if ($productExists) : ?>
                                 <td class="cs-instant-purchase-form__product-details-cell">
                                     <div class="cs-instant-purchase-form__product-details">
                                         <a class="cs-instant-purchase-form__product-name" href="<?= /* @noEscape */ $product->getProductUrl() ?>"><?= $escaper->escapeHtml($orderItem->getName()) ?></a>
@@ -177,6 +187,14 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                         ->toHtml();
                                     ?>
                                 </td>
+                                <?php else: ?>
+                                <td colspan="1" class="cs-instant-purchase-form__product-cell-not-available">
+                                    <span><?= $escaper->escapeHtml($orderItem->getName()) ?></span>
+                                </td>
+                                <td colspan="3" class="cs-instant-purchase-form__product-cell-not-available">
+                                    <span><?= $escaper->escapeHtml(__('This product is no longer available')) ?></span>
+                                </td>
+                                <?php endif; ?>
                             </tr>
                                 <?php $index++ ?>
                             <?php endforeach; ?>
