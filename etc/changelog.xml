@@ -34,6 +34,13 @@
                     <ticket_id>P2G-2182</ticket_id>
                 </entry>
             </tag>
+            <tag version="1.0.5" date="2024-05-28">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Move configurePayment call to public method to make it more adjustable in QuoteDetail controller</overview>
+                    <ticket_id>IPET-2593</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
