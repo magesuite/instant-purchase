@@ -125,10 +125,7 @@ class QuoteDetails extends \Magento\Framework\App\Action\Action implements \Mage
             $quote->getShippingAddress()
                 ->setCollectShippingRates(true);
 
-            $quote = $this->paymentConfiguration->configurePayment(
-                $quote,
-                $instantPurchaseOption->getPaymentToken()
-            );
+            $quote = $this->configurePayment($quote, $instantPurchaseOption);
 
             $quote->save();
 
@@ -163,6 +160,14 @@ class QuoteDetails extends \Magento\Framework\App\Action\Action implements \Mage
 
             return $jsonResult;
         }
+    }
+
+    public function configurePayment(\Magento\Quote\Model\Quote $quote, \Magento\InstantPurchase\Model\InstantPurchaseOption $instantPurchaseOption)
+    {
+        return $this->paymentConfiguration->configurePayment(
+            $quote,
+            $instantPurchaseOption->getPaymentToken()
+        );
     }
 
     protected function getShippingMethods($quote)
