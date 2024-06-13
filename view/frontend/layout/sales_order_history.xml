@@ -39,7 +39,7 @@
         </referenceBlock>
 
         <referenceBlock name="main.content">
-            <block ifconfig="sales/instant_purchase/active" name="magesuite.instant.purchase" template="MageSuite_InstantPurchase::instant-purchase.phtml" after="-">
+            <block name="magesuite.instant.purchase" template="MageSuite_InstantPurchase::instant-purchase.phtml" after="-">
                 <arguments>
                     <argument name="jsLayout" xsi:type="array">
                         <item name="components" xsi:type="array">
