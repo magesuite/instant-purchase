@@ -41,6 +41,12 @@
                     <ticket_id>IPET-2593</ticket_id>
                 </entry>
             </tag>
+            <tag version="1.0.7" date="2024-05-28">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Fix CSV translations</overview>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
