@@ -1,18 +1,18 @@
-"Add selected to cart","In den Warenkorb",MageSuite_InstantPurchase
-"Billing address","Rechnungsadresse",MageSuite_InstantPurchase
-"Bought for","Alter Preis",MageSuite_InstantPurchase
-"Buy now","Jetzt kaufen",MageSuite_InstantPurchase
-"Current price","Aktueller Preis",MageSuite_InstantPurchase
-"Hide details","Details verbergen",MageSuite_InstantPurchase
-"Hide","Verstecken",MageSuite_InstantPurchase
-"Instant purchase","1-Klick Kauf",MageSuite_InstantPurchase
-"Items were successfully added to cart","Produkte wurden in den Warenkorb gelegt",MageSuite_InstantPurchase
-"Last used Credit Card","Zuletzt genutzte Kreditkarte",MageSuite_InstantPurchase
-"Order Total","Bestellsumme",MageSuite_InstantPurchase
-"Payment method","Zahlungsart",MageSuite_InstantPurchase
-"Rebuy now","Rebuy nutzen",MageSuite_InstantPurchase
-"Shipping address","Lieferadresse",MageSuite_InstantPurchase
-"Shipping method","Versandart",MageSuite_InstantPurchase
-"Show details","Details zeigen",MageSuite_InstantPurchase
-"Show","Zeigen",MageSuite_InstantPurchase
-"Re-order products in 4 clicks.","Produkte mit 4 Klicks nachbestellen.",MageSuite_InstantPurchase
+"Add selected to cart","In den Warenkorb",module,MageSuite_InstantPurchase
+"Billing address","Rechnungsadresse",module,MageSuite_InstantPurchase
+"Bought for","Alter Preis",module,MageSuite_InstantPurchase
+"Buy now","Jetzt kaufen",module,MageSuite_InstantPurchase
+"Current price","Aktueller Preis",module,MageSuite_InstantPurchase
+"Hide details","Details verbergen",module,MageSuite_InstantPurchase
+"Hide","Verstecken",module,MageSuite_InstantPurchase
+"Instant purchase","1-Klick Kauf",module,MageSuite_InstantPurchase
+"Items were successfully added to cart","Produkte wurden in den Warenkorb gelegt",module,MageSuite_InstantPurchase
+"Last used Credit Card","Zuletzt genutzte Kreditkarte",module,MageSuite_InstantPurchase
+"Order Total","Bestellsumme",module,MageSuite_InstantPurchase
+"Payment method","Zahlungsart",module,MageSuite_InstantPurchase
+"Rebuy now","Rebuy nutzen",module,MageSuite_InstantPurchase
+"Shipping address","Lieferadresse",module,MageSuite_InstantPurchase
+"Shipping method","Versandart",module,MageSuite_InstantPurchase
+"Show details","Details zeigen",module,MageSuite_InstantPurchase
+"Show","Zeigen",module,MageSuite_InstantPurchase
+"Re-order products in 4 clicks.","Produkte mit 4 Klicks nachbestellen.",module,MageSuite_InstantPurchase
