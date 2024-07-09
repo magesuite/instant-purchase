@@ -98,6 +98,10 @@ class QuoteDetails extends \Magento\Framework\App\Action\Action implements \Mage
 
             $quote = $this->quoteItemsGenerator->fill($params, $quote);
 
+            if (empty($this->getQuoteItems($quote))) {
+                return;
+            }
+
             $quote->getShippingAddress()
                 ->setCollectShippingRates(true);
 
