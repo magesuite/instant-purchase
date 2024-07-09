@@ -4,6 +4,11 @@ namespace MageSuite\InstantPurchase\Service\QuoteItemsGeneratorStrategy;
 
 class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItemsGenerationStrategyInterface
 {
+    const USER_VISIBLE_ERROR_MESSAGES = [
+        'The requested qty is not available',
+        'Product that you are trying to add is not available.'
+    ];
+
     protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory;
     protected \Magento\Customer\Model\Session $customerSession;
     protected \Psr\Log\LoggerInterface $logger;
@@ -86,8 +91,10 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         try {
             $cart->addProduct($product, $info);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            if (__('The requested qty is not available') == $e->getMessage()) {
-                $this->messageManager->addErrorMessage(sprintf('%s: %s', $product->getName(), $e->getMessage()));
+            foreach (self::USER_VISIBLE_ERROR_MESSAGES as $visibleErrorMessage) {
+                if (__($visibleErrorMessage) == $e->getMessage()) {
+                    $this->messageManager->addErrorMessage(sprintf('%s: %s', $product->getName(), $e->getMessage()));
+                }
             }
 
             $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
