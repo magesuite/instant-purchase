@@ -7,15 +7,18 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
     protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory;
     protected \Magento\Customer\Model\Session $customerSession;
     protected \Psr\Log\LoggerInterface $logger;
+    protected \Magento\Framework\Message\ManagerInterface $messageManager;
 
     public function __construct(
         \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory,
         \Magento\Customer\Model\Session $customerSession,
-        \Psr\Log\LoggerInterface $logger
+        \Psr\Log\LoggerInterface $logger,
+        \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->orderItemsCollectionFactory = $orderItemsCollectionFactory;
         $this->customerSession = $customerSession;
         $this->logger = $logger;
+        $this->messageManager = $messageManager;
     }
 
     public function isApplicable($params): bool
@@ -83,6 +86,10 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         try {
             $cart->addProduct($product, $info);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            if (__('The requested qty is not available') == $e->getMessage()) {
+                $this->messageManager->addErrorMessage(sprintf('%s: %s', $product->getName(), $e->getMessage()));
+            }
+
             $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
         } catch (\Throwable $e) {
             $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
