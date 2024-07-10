@@ -11,15 +11,15 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
 <div class="cs-instant-purchase-form">
     <?= $block->getChildHtml('info') ?>
     <form id="instant_purchase" class="cs-instant-purchase-form__form cs-instant-purchase-form__form--locked" data-mage-init='{"instantPurchaseForm":"{}"}'>
-        <div class="cs-instant-purchase-form__actions cs-instant-purchase-form__actions--disabled">
-            <div class="cs-instant-purchase-form__action" data-bind="scope:'add-order-items-to-cart'">
-                <!-- ko template: getTemplate() --><!-- /ko -->
-            </div>
-            <div class="cs-instant-purchase-form__action">
-                <?= $block->getChildHtml('magesuite.instant.purchase.button'); ?>
-            </div>
-        </div>
         <?php if ($orders && count($orders)) : ?>
+            <div class="cs-instant-purchase-form__actions cs-instant-purchase-form__actions--disabled">
+                <div class="cs-instant-purchase-form__action" data-bind="scope:'add-order-items-to-cart'">
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                </div>
+                <div class="cs-instant-purchase-form__action">
+                    <?= $block->getChildHtml('magesuite.instant.purchase.button'); ?>
+                </div>
+            </div>
             <div class="table-wrapper orders-history cs-instant-purchase-form__table-wrapper">
                 <table class="table-order-items history cs-instant-purchase-form__orders-table" id="my-orders-table">
                     <caption><?= $escaper->escapeHtml(__('Orders')) ?></caption>
