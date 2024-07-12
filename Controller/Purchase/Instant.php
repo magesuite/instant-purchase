@@ -78,6 +78,8 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
 
     private function createResponse(string $message): \Magento\Framework\Controller\Result\Json
     {
+        $this->customerSession->unsInstantPurchaseThrownErrors();
+
         /** @var \Magento\Framework\Controller\Result\Json $result */
         $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON);
         $result->setData(['response' => $message]);

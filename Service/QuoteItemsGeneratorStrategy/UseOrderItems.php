@@ -92,8 +92,14 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
             $cart->addProduct($product, $info);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             foreach (self::USER_VISIBLE_ERROR_MESSAGES as $visibleErrorMessage) {
-                if (__($visibleErrorMessage) == $e->getMessage()) {
-                    $this->messageManager->addErrorMessage(sprintf('%s: %s', $product->getName(), $e->getMessage()));
+                $errorMessage = sprintf('%s: %s', $product->getName(), $e->getMessage());
+                $instantPurchasedThrownErrors = $this->customerSession->getInstantPurchaseThrownErrors() ?? [];
+
+                if (__($visibleErrorMessage) == $e->getMessage() && !in_array($errorMessage, $instantPurchasedThrownErrors)) {
+                    $instantPurchasedThrownErrors[] = $errorMessage;
+                    $this->customerSession->setInstantPurchaseThrownErrors($instantPurchasedThrownErrors);
+
+                    $this->messageManager->addErrorMessage($errorMessage);
                 }
             }
 
