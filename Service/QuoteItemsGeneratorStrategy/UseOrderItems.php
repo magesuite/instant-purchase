@@ -72,6 +72,11 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         $qty = null
     ): void {
         $info = $orderItem->getProductOptionByCode('info_buyRequest');
+
+        if (array_key_exists('custom_price', $info)) {
+            unset($info['custom_price']);
+        }
+
         $info = new \Magento\Framework\DataObject($info);
         $info->setQty($qty ?? $orderItem->getQtyOrdered());
 
