@@ -15,6 +15,7 @@ define([
                     formLockedClass: `${this.options.baseClass}__form--locked`,
                     orderBodyClass: `${this.options.baseClass}__order`,
                     orderVisibleClass: `${this.options.baseClass}__order--visible`,
+                    orderHasSelectedClass: `${this.options.baseClass}__order--has-selected`,
                     orderInfoRowClass: `${this.options.baseClass}__order-info`,
                     orderCheckboxClass: `${this.options.baseClass}__order-checkbox`,
                     productCheckboxClass: `${this.options.baseClass}__product-checkbox`,
@@ -81,6 +82,7 @@ define([
             const isChecked = event.currentTarget.checked;
             const $order = $(event.currentTarget).closest(`.${this.options.orderBodyClass}`);
             const orderCheckbox = $order.find(`.${this.options.orderCheckboxClass}`)[0];
+            const anyProductSelected = $order.find(`.${this.options.productCheckboxClass}:checked`).length;
 
             if (!isChecked && orderCheckbox.checked) {
                 orderCheckbox.checked = false;
@@ -90,6 +92,12 @@ define([
                 if (allProductsSelected) {
                     orderCheckbox.checked = true;
                 }
+            }
+
+            if (anyProductSelected) {
+                $order.addClass(this.options.orderHasSelectedClass);
+            } else {
+                $order.removeClass(this.options.orderHasSelectedClass);
             }
 
             this.setActionsAvailability();

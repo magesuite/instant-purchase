@@ -47,6 +47,13 @@
                     <overview>Fix CSV translations</overview>
                 </entry>
             </tag>
+            <tag version="1.0.12" date="2024-07-22">
+                <entry>
+                    <type>FEATURE</type>
+                    <overview>Add HTML class for an order with information that a product has been selected in the order</overview>
+                    <ticket_id>IPET-2671</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
