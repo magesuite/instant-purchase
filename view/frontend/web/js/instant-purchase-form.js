@@ -119,6 +119,7 @@ define([
                 $notSelectedProductCheckboxes.each((i, checkbox) => {checkbox.checked = true});
             } else if (!isChecked) {
                 $order.find(`.${this.options.productCheckboxClass}`).each((i, checkbox) => {checkbox.checked = false});
+                $order.removeClass(this.options.orderHasSelectedClass);
             }
 
             if (isChecked && !$order.hasClass(this.options.orderVisibleClass)) {

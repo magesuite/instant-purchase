@@ -54,6 +54,13 @@
                     <ticket_id>IPET-2671</ticket_id>
                 </entry>
             </tag>
+            <tag version="1.0.13" date="2024-07-23">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Remove class with information that any product was selected if the main order checkbox is unchecked</overview>
+                    <ticket_id>IPET-2671</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
