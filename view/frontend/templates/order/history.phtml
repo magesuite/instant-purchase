@@ -82,7 +82,7 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                             <th colspan="2" scope="col"><?= $escaper->escapeHtml(__('Product')) ?></th>
                             <th scope="col"><?= $escaper->escapeHtml(__('Bought for')) ?></th>
                             <th class="cs-instant-purchase-form__current-price-cell" scope="col"><?= $escaper->escapeHtml(__('Current price')) ?></th>
-                            <th colspan="2" scope="col"><?= $escaper->escapeHtml(__('Qty')) ?></th>
+                            <th colspan="3" scope="col"><?= $escaper->escapeHtml(__('Qty')) ?></th>
                             <th class="cs-instant-purchase-form__table-side-cell" rowspan="<?= $escaper->escapeHtml($orderItemsCount + 1) ?>" ></th>
                         </tr>
                         <?php foreach ($orderItems as $orderItem) : ?>
@@ -173,7 +173,7 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                         ?>
                                         <?= /* @noEscape */  $priceRenderer->render($priceType, $product, $arguments) ?>
                                     </td>
-                                    <td colspan="2" class="cs-instant-purchase-form__product-cell-qty">
+                                    <td colspan="3" class="cs-instant-purchase-form__product-cell-qty">
                                         <?= $block->getLayout()
                                             ->createBlock(\Magento\Framework\View\Element\Template::class)
                                             ->setInputName('qty[' . $orderItem->getId() . ']')
@@ -191,7 +191,7 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                     <td colspan="1" class="cs-instant-purchase-form__product-cell-not-available">
                                         <span><?= $escaper->escapeHtml($orderItem->getName()) ?></span>
                                     </td>
-                                    <td colspan="3" class="cs-instant-purchase-form__product-cell-not-available">
+                                    <td colspan="4" class="cs-instant-purchase-form__product-cell-not-available">
                                         <span><?= $escaper->escapeHtml(__('This product is no longer available')) ?></span>
                                     </td>
                                 <?php endif; ?>

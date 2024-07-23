@@ -61,6 +61,12 @@
                     <ticket_id>IPET-2671</ticket_id>
                 </entry>
             </tag>
+            <tag version="1.0.14" date="2024-07-23">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Update order table structure</overview>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
