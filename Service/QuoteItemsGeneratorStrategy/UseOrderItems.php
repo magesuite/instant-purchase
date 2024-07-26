@@ -65,7 +65,9 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
             return $quote;
         }
 
-        $this->displayUserVisibleErrorMessages = (bool)$params['use_default_data'];
+        if (isset($params['use_default_data'])) {
+            $this->displayUserVisibleErrorMessages = (bool)$params['use_default_data'];
+        }
 
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
         foreach ($orderItems as $orderItem) {
