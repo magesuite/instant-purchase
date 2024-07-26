@@ -33,7 +33,9 @@ define([
         }).always(function () {
             $(document.body).trigger('processStop');
         }).done(() => {
-            window.location.replace(urlBuilder.build('checkout/onepage/success'));
+            if (!data.error) {
+                window.location.replace(urlBuilder.build('checkout/onepage/success'));
+            }
         })
     };
 });
