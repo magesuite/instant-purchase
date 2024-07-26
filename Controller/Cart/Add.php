@@ -32,6 +32,8 @@ class Add extends \Magento\Framework\App\Action\Action implements \Magento\Frame
         $quote->collectTotals();
         $quote->save();
 
-        $this->messageManager->addSuccessMessage(__('Items were successfully added to cart'));
+        if (!empty($quote->getAllVisibleItems())) {
+            $this->messageManager->addSuccessMessage(__('Items were successfully added to cart'));
+        }
     }
 }

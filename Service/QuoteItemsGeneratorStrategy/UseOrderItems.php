@@ -9,6 +9,8 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         'Product that you are trying to add is not available.'
     ];
 
+    protected bool $displayUserVisibleErrorMessages = true;
+
     protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory;
     protected \Magento\Customer\Model\Session $customerSession;
     protected \Psr\Log\LoggerInterface $logger;
@@ -63,6 +65,8 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
             return $quote;
         }
 
+        $this->displayUserVisibleErrorMessages = (bool)$params['use_default_data'];
+
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
         foreach ($orderItems as $orderItem) {
             $this->addItemToCart($orderItem, $quote, $orderItem->getProduct(), $itemIds[$orderItem->getId()]);
@@ -91,15 +95,13 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         try {
             $cart->addProduct($product, $info);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            foreach (self::USER_VISIBLE_ERROR_MESSAGES as $visibleErrorMessage) {
-                $errorMessage = sprintf('%s: %s', $product->getName(), $e->getMessage());
-                $instantPurchasedThrownErrors = $this->customerSession->getInstantPurchaseThrownErrors() ?? [];
+            if ($this->displayUserVisibleErrorMessages) {
+                foreach (self::USER_VISIBLE_ERROR_MESSAGES as $visibleErrorMessage) {
+                    $errorMessage = sprintf('%s: %s', $product->getName(), $e->getMessage());
 
-                if (__($visibleErrorMessage) == $e->getMessage() && !in_array($errorMessage, $instantPurchasedThrownErrors)) {
-                    $instantPurchasedThrownErrors[] = $errorMessage;
-                    $this->customerSession->setInstantPurchaseThrownErrors($instantPurchasedThrownErrors);
-
-                    $this->messageManager->addErrorMessage($errorMessage);
+                    if (__($visibleErrorMessage) == $e->getMessage()) {
+                        $this->messageManager->addErrorMessage($errorMessage);
+                    }
                 }
             }
 
