@@ -95,17 +95,19 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         try {
             $cart->addProduct($product, $info);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            if ($this->displayUserVisibleErrorMessages) {
-                foreach (self::USER_VISIBLE_ERROR_MESSAGES as $visibleErrorMessage) {
-                    $errorMessage = sprintf('%s: %s', $product->getName(), $e->getMessage());
+            $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
 
-                    if (__($visibleErrorMessage) == $e->getMessage()) {
-                        $this->messageManager->addErrorMessage($errorMessage);
-                    }
-                }
+            if (!$this->displayUserVisibleErrorMessages) {
+                return;
             }
 
-            $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
+            foreach (self::USER_VISIBLE_ERROR_MESSAGES as $visibleErrorMessage) {
+                $errorMessage = sprintf('%s: %s', $product->getName(), $e->getMessage());
+
+                if (__($visibleErrorMessage) == $e->getMessage()) {
+                    $this->messageManager->addErrorMessage($errorMessage);
+                }
+            }
         } catch (\Throwable $e) {
             $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
         }
