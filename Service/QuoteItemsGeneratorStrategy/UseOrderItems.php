@@ -9,7 +9,7 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         'Product that you are trying to add is not available.'
     ];
 
-    protected bool $displayUserVisibleErrorMessages = true;
+    protected bool $displayUserVisibleErrorMessages = false;
 
     protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory;
     protected \Magento\Customer\Model\Session $customerSession;
