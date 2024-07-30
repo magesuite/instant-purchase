@@ -32,7 +32,7 @@ define([
             }
         }).always(function () {
             $(document.body).trigger('processStop');
-        }).done(() => {
+        }).done((data) => {
             if (!data.error) {
                 window.location.replace(urlBuilder.build('checkout/onepage/success'));
             }
