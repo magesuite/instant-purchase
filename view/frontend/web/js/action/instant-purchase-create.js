@@ -26,11 +26,16 @@ define([
      * @return {(jqXHR|Deferred)}
      */
     return function(useDefaultData) {
-        const formData = instantPurchaseModel.collectOrderData(useDefaultData);
+        var formData = instantPurchaseModel.collectOrderData(useDefaultData);
 
         if (!formData || !hasAnyProductForReorder(formData)) {
             return $.Deferred().reject();
         }
+
+        formData.push({
+            name: 'use_default_data',
+            value: useDefaultData ?? 0
+        })
 
         return $.ajax({
             url: endpoint,

@@ -55,20 +55,20 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             $this->logger->error(sprintf('Error when trying to buy using instant purchase %s', $e->getMessage()));
 
-            return $this->createResponse($this->createGenericErrorMessage(), false);
+            return $this->createResponse($this->createGenericErrorMessage(), true);
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error when trying to buy using instant purchase %s', $e->getMessage()));
 
             return $this->createResponse(
                 $e instanceof \Magento\Framework\Exception\LocalizedException ? $e->getMessage() : $this->createGenericErrorMessage(),
-                false
+                true
             );
         }
 
         $order = $this->orderRepository->get($orderId);
         $message = __('Your order number is: %1.', $order->getIncrementId());
 
-        return $this->createResponse($message, true);
+        return $this->createResponse($message);
     }
 
     private function createGenericErrorMessage(): string
@@ -76,11 +76,11 @@ class Instant extends \Magento\Framework\App\Action\Action implements \Magento\F
         return (string)__('Something went wrong while processing your order. Please try again later.');
     }
 
-    private function createResponse(string $message): \Magento\Framework\Controller\Result\Json
+    private function createResponse(string $message, bool $isError = false): \Magento\Framework\Controller\Result\Json
     {
         /** @var \Magento\Framework\Controller\Result\Json $result */
         $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON);
-        $result->setData(['response' => $message]);
+        $result->setData(['response' => $message, 'error' => $isError]);
 
         return $result;
     }
