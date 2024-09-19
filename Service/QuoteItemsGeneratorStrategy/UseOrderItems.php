@@ -94,6 +94,8 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         $info = new \Magento\Framework\DataObject($info);
         $info->setQty($qty ?? $orderItem->getQtyOrdered());
 
+        $product->setOrderItemId($orderItem->getItemId());
+
         try {
             $cart->addProduct($product, $info);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
