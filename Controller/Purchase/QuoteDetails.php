@@ -105,8 +105,6 @@ class QuoteDetails extends \Magento\Framework\App\Action\Action implements \Mage
             $quote->getShippingAddress()
                 ->setCollectShippingRates(true);
 
-            $quote = $this->configurePayment($quote, $instantPurchaseOption);
-
             if (empty($instantPurchaseOption->getShippingMethod()->getCarrierCode())) {
                 $cheapestShippingMethod = $this->setCheapestShippingMethod($quote);
 
@@ -130,6 +128,8 @@ class QuoteDetails extends \Magento\Framework\App\Action\Action implements \Mage
 
             $quote->getShippingAddress()
                 ->setCollectShippingRates(true);
+
+            $quote = $this->configurePayment($quote, $instantPurchaseOption);
 
             $quote->save();
 
