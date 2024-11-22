@@ -67,6 +67,13 @@
                     <overview>Update order table structure</overview>
                 </entry>
             </tag>
+            <tag version="1.0.20" date="2024-11-22">
+                <entry>
+                    <type>FEATURE</type>
+                    <overview>Implement getQuoteData function for instant purchase model</overview>
+                    <ticket_id>IPET-2723</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
