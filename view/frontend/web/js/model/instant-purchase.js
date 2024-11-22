@@ -206,5 +206,9 @@ define([
                 quoteData(quote);
             }
         },
+
+        getQuoteData: function () {
+            return quoteData;
+        }
     };
 });
