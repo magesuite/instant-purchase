@@ -1,33 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\InstantPurchase\Service\QuoteItemsGeneratorStrategy;
 
 class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItemsGenerationStrategyInterface
 {
-    const USER_VISIBLE_ERROR_MESSAGES = [
+    public const USER_VISIBLE_ERROR_MESSAGES = [
         'The requested qty is not available',
-        'Product that you are trying to add is not available.'
+        'Product that you are trying to add is not available.',
+        'The required options you selected are not available.',
+        'Not enough items for sale',
     ];
 
     protected bool $displayUserVisibleErrorMessages = true;
 
-    protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory;
-    protected \Magento\Customer\Model\Session $customerSession;
-    protected \Psr\Log\LoggerInterface $logger;
-    protected \Magento\Framework\Message\ManagerInterface $messageManager;
-
+    // phpcs:ignore
     public function __construct(
-        \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory,
-        \Magento\Customer\Model\Session $customerSession,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory,
+        protected \Magento\Customer\Model\Session $customerSession,
+        protected \Psr\Log\LoggerInterface $logger,
+        protected \Magento\Framework\Message\ManagerInterface $messageManager,
     ) {
-        $this->orderItemsCollectionFactory = $orderItemsCollectionFactory;
-        $this->customerSession = $customerSession;
-        $this->logger = $logger;
-        $this->messageManager = $messageManager;
     }
 
+    // phpcs:ignore
     public function isApplicable($params): bool
     {
         return
@@ -35,6 +32,7 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
             array_key_exists('qty', $params);
     }
 
+    // phpcs:ignore
     public function fill($params, $quote): \Magento\Quote\Model\Quote
     {
         $itemIds = [];
@@ -97,7 +95,8 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         $product->setOrderItemId($orderItem->getItemId());
 
         try {
-            $cart->addProduct($product, $info);
+            $this->addProduct($cart, $product, $info);
+            $cart->setData('item_added_to_cart_flag', true);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
 
@@ -114,6 +113,21 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
             }
         } catch (\Throwable $e) {
             $this->logger->error(sprintf('Error when trying to fill instant purchase quote with products %s', $e->getMessage()));
+        }
+    }
+
+    /**
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function addProduct(
+        \Magento\Quote\Model\Quote $quote,
+        \Magento\Catalog\Model\Product $product,
+        \Magento\Framework\DataObject $info
+    ): void {
+        $item = $quote->addProduct($product, $info);
+
+        if (is_string($item)) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($item));
         }
     }
 }

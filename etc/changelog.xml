@@ -74,6 +74,13 @@
                     <ticket_id>IPET-2723</ticket_id>
                 </entry>
             </tag>
+            <tag version="1.0.21" date="2025-06-04">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Update order table structure &amp; added "Out of stock" note</overview>
+                    <ticket_id>MGS-5486</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>

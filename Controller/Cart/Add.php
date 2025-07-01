@@ -1,39 +1,45 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\InstantPurchase\Controller\Cart;
 
 class Add extends \Magento\Framework\App\Action\Action implements \Magento\Framework\App\Action\HttpPostActionInterface
 {
-    protected \Magento\Checkout\Model\Session $checkoutSession;
-    protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory;
-    protected \MageSuite\InstantPurchase\Service\QuoteItemsGenerator $quoteFiller;
-
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory,
-        \MageSuite\InstantPurchase\Service\QuoteItemsGenerator $quoteFiller
+        protected \Magento\Checkout\Model\Session $checkoutSession,
+        protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory,
+        protected \MageSuite\InstantPurchase\Service\QuoteItemsGenerator $quoteFiller,
     ) {
         parent::__construct($context);
-
-        $this->checkoutSession = $checkoutSession;
-        $this->orderItemsCollectionFactory = $orderItemsCollectionFactory;
-        $this->quoteFiller = $quoteFiller;
     }
 
-    public function execute()
+    public function execute(): \Magento\Framework\Controller\ResultInterface
     {
-        $postData = $this->_request->getParams();
+        /** @var \Magento\Framework\Controller\Result\Json $result */
+        $result = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON);
+        $status = false;
 
-        $quote = $this->checkoutSession->getQuote();
+        try {
+            $postData = $this->_request->getParams();
+            $quote = $this->checkoutSession->getQuote();
+            $this->quoteFiller->fill($postData, $quote);
 
-        $this->quoteFiller->fill($postData, $quote);
+            $quote->collectTotals();
+            $quote->save();
+            $status = (bool) $quote->getData('item_added_to_cart_flag');
 
-        $quote->collectTotals();
-        $quote->save();
-
-        if (!empty($quote->getAllVisibleItems())) {
-            $this->messageManager->addSuccessMessage(__('Items were successfully added to cart'));
+            if ($status) {
+                $this->messageManager->addSuccessMessage(__('Items were successfully added to cart'));
+            }
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
         }
+        $result->setData([
+            'status' => $status,
+        ]);
+
+        return $result;
     }
 }

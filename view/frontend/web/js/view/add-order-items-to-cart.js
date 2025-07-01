@@ -19,8 +19,12 @@ define([
          * Calls add to cart action and opens minicart
          */
         addItemsToCart: function () {
-            addOrderItemsToCart().then(() => {
-                $("[data-block='minicart']").trigger("openMinicart");
+            addOrderItemsToCart().then((response) => {
+                const status = response.status;
+
+                if (status) {
+                    $("[data-block='minicart']").trigger("openMinicart");
+                }
             });
         }
     });

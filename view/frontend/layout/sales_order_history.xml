@@ -8,6 +8,8 @@
             </action>
             <arguments>
                 <argument name="quote_item_renderer_view_model" xsi:type="object">MageSuite\InstantPurchase\ViewModel\OrderItemRenderer</argument>
+                <argument name="order_item_wrapper_view_model" xsi:type="object">MageSuite\InstantPurchase\ViewModel\OrderItemWrapper</argument>
+                <argument name="order_item_resolver_view_model" xsi:type="object">MageSuite\InstantPurchase\ViewModel\ItemResolver</argument>
                 <argument name="initially_expanded_orders_qty" xsi:type="number">3</argument>
                 <argument name="jsLayout" xsi:type="array">
                     <item name="components" xsi:type="array">
