@@ -39,9 +39,9 @@ class OrderItemToConfigurableItemWrapper implements \Magento\Catalog\Model\Produ
             return false;
         }
 
-        if ($this->orderItem->getProductType() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+        if ($this->isConfigurable()) {
             /** @var \Magento\Sales\Model\Order\Item $childItem */
-            foreach ($this->orderItem->getChildrenItems() as $childItem) {
+            foreach ($this->getChildrenItems() as $childItem) {
                 $isAvailable = (bool) $childItem->getProduct()?->isAvailable();
 
                 if (!$isAvailable) {
@@ -51,5 +51,31 @@ class OrderItemToConfigurableItemWrapper implements \Magento\Catalog\Model\Produ
         }
 
         return $isAvailable;
+    }
+
+    public function getChildrenItems(): array
+    {
+        return $this->orderItem->getChildrenItems();
+    }
+
+    public function getChildItem(): ?self
+    {
+        if (!$this->isConfigurable() || !$this->hasChildren()) {
+            return null;
+        }
+
+        $childItem = $this->orderItem->getChildrenItems()[0];
+
+        return new OrderItemToConfigurableItemWrapper($childItem);
+    }
+
+    protected function hasChildren(): bool
+    {
+        return $this->orderItem->getChildrenItems() > 0;
+    }
+
+    protected function isConfigurable(): bool
+    {
+        return $this->orderItem->getProductType() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE;
     }
 }

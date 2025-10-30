@@ -13,6 +13,11 @@ class ItemResolver implements \Magento\Framework\View\Element\Block\ArgumentInte
 
     public function getFinalProduct(\Magento\Catalog\Model\Product\Configuration\Item\ItemInterface $item): \Magento\Catalog\Api\Data\ProductInterface
     {
-        return $this->itemResolver->getFinalProduct($item);
+        return $this->itemResolver->getFinalProduct($this->resolveItem($item));
+    }
+
+    public function resolveItem(\Magento\Catalog\Model\Product\Configuration\Item\ItemInterface $item): \Magento\Catalog\Model\Product\Configuration\Item\ItemInterface
+    {
+        return $item->getChildItem() ?: $item;
     }
 }

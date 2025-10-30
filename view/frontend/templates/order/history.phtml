@@ -5,13 +5,13 @@
  * @var \Magento\Sales\Block\Order\History $orders
  * @var \MageSuite\InstantPurchase\ViewModel\OrderItemRenderer $quoteItemRendererViewModel
  * @var \MageSuite\InstantPurchase\ViewModel\OrderItemWrapper $orderItemWrapperViewModel
- * @var \MageSuite\InstantPurchase\ViewModel\ItemResolver $ItemResolverViewModel
+ * @var \MageSuite\InstantPurchase\ViewModel\ItemResolver $itemResolverViewModel
  */
 $orders = $block->getOrders();
 $imageHelper = $this->helper(\Magento\Catalog\Helper\Image::class); // phpcs:ignore
 $quoteItemRendererViewModel = $block->getQuoteItemRendererViewModel();
 $orderItemWrapperViewModel = $block->getData('order_item_wrapper_view_model');
-$ItemResolverViewModel = $block->getData('order_item_resolver_view_model');
+$itemResolverViewModel = $block->getData('order_item_resolver_view_model');
 $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
 ?>
 
@@ -99,18 +99,17 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                     <?php
                                     $renderer = $quoteItemRendererViewModel->setItem($orderItem);
                                     $item = $orderItemWrapperViewModel->create($orderItem);
-                                    $product = $orderItem->getProduct();
-                                    $productExists = $product ?: false;
+                                    $product = $itemResolverViewModel->getFinalProduct($item);
+                                    $productExists = $product->getId() ?? false;
 
                                     $productInStock = $item->isProductAvailable();
                                     $productImageUrl = '';
                                     $productImage2xUrl = '';
 
                                     if ($productExists) {
-                                        $imageProduct = $ItemResolverViewModel->getFinalProduct($item);
-                                        $productImage = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
+                                        $productImage = $imageHelper->init($product, 'cart_page_product_thumbnail');
                                         $productImageUrl = $escaper->escapeUrl($productImage->getUrl());
-                                        $productImage2x = $imageHelper->init($imageProduct, 'cart_page_product_thumbnail');
+                                        $productImage2x = $imageHelper->init($product, 'cart_page_product_thumbnail');
                                         $productImage2xUrl = $escaper->escapeUrl($productImage2x->getUrl());
                                     }
                                     ?>
