@@ -100,9 +100,10 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                     $renderer = $quoteItemRendererViewModel->setItem($orderItem);
                                     $item = $orderItemWrapperViewModel->create($orderItem);
                                     $product = $itemResolverViewModel->getFinalProduct($item);
-                                    $productExists = $product->getId() ?? false;
 
+                                    $productExists = !empty($product);
                                     $productInStock = $item->isProductAvailable();
+
                                     $productImageUrl = '';
                                     $productImage2xUrl = '';
 
