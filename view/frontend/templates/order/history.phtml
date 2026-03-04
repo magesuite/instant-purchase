@@ -112,6 +112,9 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                         $productImageUrl = $escaper->escapeUrl($productImage->getUrl());
                                         $productImage2x = $imageHelper->init($product, 'cart_page_product_thumbnail');
                                         $productImage2xUrl = $escaper->escapeUrl($productImage2x->getUrl());
+                                    } else {
+                                        $productImageUrl = $escaper->escapeUrl($imageHelper->getDefaultPlaceholderUrl('image'));
+                                        $productImage2xUrl = $escaper->escapeUrl($imageHelper->getDefaultPlaceholderUrl('image'));
                                     }
                                     ?>
 
