@@ -26,4 +26,15 @@ class ItemResolver implements \Magento\Framework\View\Element\Block\ArgumentInte
     {
         return $item->getChildItem() ?: $item;
     }
+
+    public function getProductUrl(\Magento\Catalog\Model\Product\Configuration\Item\ItemInterface $item): ?string
+    {
+        $product = $item->getProduct();
+
+        if (!$product || !$product->getId()) {
+            return null;
+        }
+
+        return $product->getProductUrl();
+    }
 }

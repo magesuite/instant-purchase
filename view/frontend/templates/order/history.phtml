@@ -144,7 +144,7 @@ $initiallyExpandedOrdersQty = $block->getInitiallyExpandedOrdersQty() ?: 3;
                                             <?php if (!$productInStock) : ?>
                                                 <p class="cs-instant-purchase-form__product-not-available"><?= $escaper->escapeHtml(__('Out of Stock')) ?></p>
                                             <?php endif; ?>
-                                            <a class="cs-instant-purchase-form__product-name" href="<?= /* @noEscape */ $product->getProductUrl() ?>"><?= $escaper->escapeHtml($orderItem->getName()) ?></a>
+                                            <a class="cs-instant-purchase-form__product-name" href="<?= $escaper->escapeUrl($itemResolverViewModel->getProductUrl($item)) ?>"><?= $escaper->escapeHtml($orderItem->getName()) ?></a>
                                             <?php $options = $renderer->getItemOptions(); ?>
                                             <?php if ($options) : ?>
                                                 <dl class="item-options">
