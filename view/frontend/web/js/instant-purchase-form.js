@@ -47,7 +47,7 @@ define([
          * Handles click on order row (excluding other clickable elements).
          */
         orderInfoRowClickHandler: function(event) {
-            if ($(event.target).is(`input, label, a`)) {
+            if ($(event.target).closest(`input, label, a, button`, event.currentTarget).length) {
                 return;
             }
 
