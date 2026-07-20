@@ -21,6 +21,7 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         protected \Magento\Customer\Model\Session $customerSession,
         protected \Psr\Log\LoggerInterface $logger,
         protected \Magento\Framework\Message\ManagerInterface $messageManager,
+        protected \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
     ) {
     }
 
@@ -69,12 +70,36 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
 
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
         foreach ($orderItems as $orderItem) {
-            $this->addItemToCart($orderItem, $quote, $orderItem->getProduct(), $itemIds[$orderItem->getId()]);
+            $product = $this->getFreshProduct($orderItem, $quote);
+
+            if ($product === null) {
+                continue;
+            }
+
+            $this->addItemToCart($orderItem, $quote, $product, $itemIds[$orderItem->getId()]);
         }
 
         $quote->setInstantPurchaseOrigin('order_history');
 
         return $quote;
+    }
+
+    protected function getFreshProduct(
+        \Magento\Sales\Api\Data\OrderItemInterface $orderItem,
+        \Magento\Quote\Model\Quote $quote
+    ): ?\Magento\Catalog\Api\Data\ProductInterface {
+        try {
+            return $this->productRepository->getById(
+                (int)$orderItem->getProductId(),
+                false,
+                (int)$quote->getStoreId(),
+                true
+            );
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $this->logger->error(sprintf('Error when trying to load product for instant purchase reorder %s', $e->getMessage()));
+
+            return null;
+        }
     }
 
     protected function addItemToCart( // phpcs:ignore

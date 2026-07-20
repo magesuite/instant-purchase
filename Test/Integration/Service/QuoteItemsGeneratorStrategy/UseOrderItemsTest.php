@@ -1,38 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\InstantPurchase\Test\Integration\Service\QuoteItemsGeneratorStrategy;
 
 class UseOrderItemsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Magento\TestFramework\ObjectManager
-     */
-    protected $objectManager;
+    protected \Magento\TestFramework\ObjectManager $objectManager;
 
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
+    protected \Magento\Customer\Model\Session $customerSession;
 
-    /**
-     * @var \Magento\Customer\Model\Customer
-     */
-    protected $customer;
+    protected \Magento\Customer\Model\Customer $customer;
 
-    /**
-     * @var \Magento\Sales\Api\Data\OrderInterfaceFactory
-     */
-    protected $orderFactory;
+    protected \Magento\Sales\Api\Data\OrderInterfaceFactory $orderFactory;
 
-    /**
-     * @var \Magento\Sales\Model\OrderFactory
-     */
-    protected $quoteFactory;
+    protected \Magento\Quote\Model\QuoteFactory $quoteFactory;
 
-    /**
-     * @var \MageSuite\InstantPurchase\Service\QuoteItemsGeneratorStrategy\UseOrderItems
-     */
-    protected $useOrderItems;
+    protected \MageSuite\InstantPurchase\Service\QuoteItemsGeneratorStrategy\UseOrderItems $useOrderItems;
 
     public function setUp(): void
     {
@@ -50,7 +34,7 @@ class UseOrderItemsTest extends \PHPUnit\Framework\TestCase
      * @magentoDbIsolation enabled
      * @magentoDataFixture Magento/Checkout/_files/order_items.php
      */
-    public function testItCopiesBoughtItemsToNewQuote()
+    public function testItCopiesBoughtItemsToNewQuote(): void
     {
         $this->customerSession->setCustomerAsLoggedIn($this->getCustomer());
 
@@ -81,7 +65,153 @@ class UseOrderItemsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(10, $quoteItem->getPrice());
     }
 
-    protected function getCustomer()
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     * @magentoDataFixture MageSuite_InstantPurchase::Test/Integration/_files/order_with_customer_and_configurable_product.php
+     */
+    public function testItCopiesBoughtConfigurableProductToNewQuote(): void
+    {
+        $this->customerSession->setCustomerAsLoggedIn($this->getCustomer());
+
+        $order = $this->orderFactory->create();
+        $order->loadByIncrementId('100000002');
+
+        $quote = $this->quoteFactory->create();
+
+        $this->assertEmpty($quote->getAllItems());
+
+        $params = ['qty' => [], 'reorder_item' => []];
+        foreach ($this->getConfigurableOrderItems($order) as $configurableOrderItem) {
+            $params['qty'][$configurableOrderItem->getId()] = 1;
+            $params['reorder_item'][$configurableOrderItem->getId()] = 'on';
+        }
+
+        $this->assertCount(2, $params['reorder_item']);
+
+        $this->useOrderItems->fill($params, $quote);
+
+        $this->assertCount(4, $quote->getAllItems());
+        $this->assertCount(2, $quote->getAllVisibleItems());
+
+        $childSkus = [];
+        foreach ($quote->getAllVisibleItems() as $parentItem) {
+            $this->assertEquals(
+                \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE,
+                $parentItem->getProductType()
+            );
+            $this->assertEquals(1, $parentItem->getQty());
+            $this->assertNotEmpty($parentItem->getBuyRequest()->getSuperAttribute());
+
+            $children = $parentItem->getChildren();
+            $this->assertCount(1, $children);
+
+            $childItem = array_shift($children);
+            $this->assertEquals(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE, $childItem->getProductType());
+            $this->assertEquals(1, $childItem->getQty());
+
+            $childSkus[] = $childItem->getSku();
+        }
+
+        sort($childSkus);
+        $this->assertEquals(['simple_10', 'simple_20'], $childSkus);
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     * @magentoDataFixture MageSuite_InstantPurchase::Test/Integration/_files/order_with_customer_and_multiple_configurable_products.php
+     */
+    public function testItCopiesComplexConfigurableAndSimpleCartToNewQuote(): void
+    {
+        $firstConfigurableId = 1;
+        $secondConfigurableId = 60;
+
+        $this->customerSession->setCustomerAsLoggedIn($this->getCustomer());
+
+        $order = $this->orderFactory->create();
+        $order->loadByIncrementId('100000002');
+
+        $quote = $this->quoteFactory->create();
+
+        $this->assertEmpty($quote->getAllItems());
+
+        $params = ['qty' => [], 'reorder_item' => []];
+        foreach ($order->getItems() as $orderItem) {
+            if ($orderItem->getParentItemId() !== null) {
+                continue;
+            }
+
+            $isFirstConfigurable = (int)$orderItem->getProductId() === $firstConfigurableId
+                && $orderItem->getProductType() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE;
+
+            $params['qty'][$orderItem->getId()] = $isFirstConfigurable ? 2 : 1;
+            $params['reorder_item'][$orderItem->getId()] = 'on';
+        }
+
+        $this->assertCount(6, $params['reorder_item']);
+
+        $this->useOrderItems->fill($params, $quote);
+
+        $this->assertCount(6, $quote->getAllVisibleItems());
+        $this->assertCount(11, $quote->getAllItems());
+
+        $firstConfigurableChildSkus = [];
+        $secondConfigurableChildSkus = [];
+        $simpleRows = [];
+
+        foreach ($quote->getAllVisibleItems() as $visibleItem) {
+            if ($visibleItem->getProductType() !== \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                $simpleRows[] = $visibleItem;
+                continue;
+            }
+
+            $children = $visibleItem->getChildren();
+            $this->assertCount(1, $children);
+
+            $childItem = array_shift($children);
+            $this->assertEquals(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE, $childItem->getProductType());
+
+            if ((int)$visibleItem->getProduct()->getId() === $firstConfigurableId) {
+                $this->assertEquals(2, $visibleItem->getQty());
+                $firstConfigurableChildSkus[] = $childItem->getSku();
+                continue;
+            }
+
+            $this->assertEquals($secondConfigurableId, (int)$visibleItem->getProduct()->getId());
+            $this->assertEquals(1, $visibleItem->getQty());
+            $secondConfigurableChildSkus[] = $childItem->getSku();
+        }
+
+        sort($firstConfigurableChildSkus);
+        $this->assertEquals(['simple_10', 'simple_20'], $firstConfigurableChildSkus);
+
+        sort($secondConfigurableChildSkus);
+        $this->assertEquals(['simple_30', 'simple_40', 'simple_50'], $secondConfigurableChildSkus);
+
+        $this->assertCount(1, $simpleRows);
+        $simpleRow = array_shift($simpleRows);
+        $this->assertEquals('simple_regular', $simpleRow->getSku());
+        $this->assertEquals(1, $simpleRow->getQty());
+        $this->assertEmpty($simpleRow->getChildren());
+    }
+
+    protected function getConfigurableOrderItems(\Magento\Sales\Api\Data\OrderInterface $order): array
+    {
+        $configurableOrderItems = [];
+        foreach ($order->getItems() as $orderItem) {
+            if (
+                $orderItem->getParentItemId() === null
+                && $orderItem->getProductType() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE
+            ) {
+                $configurableOrderItems[] = $orderItem;
+            }
+        }
+
+        return $configurableOrderItems;
+    }
+
+    protected function getCustomer(): \Magento\Customer\Model\Customer
     {
         return $this->customer->load(1);
     }
