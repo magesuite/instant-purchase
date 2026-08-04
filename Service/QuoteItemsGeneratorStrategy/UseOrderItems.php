@@ -6,7 +6,7 @@ namespace MageSuite\InstantPurchase\Service\QuoteItemsGeneratorStrategy;
 
 class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItemsGenerationStrategyInterface
 {
-    public const USER_VISIBLE_ERROR_MESSAGES = [
+    public const array USER_VISIBLE_ERROR_MESSAGES = [
         'The requested qty is not available',
         'Product that you are trying to add is not available.',
         'The required options you selected are not available.',
@@ -17,7 +17,7 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
 
     // phpcs:ignore
     public function __construct(
-        protected \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemsCollectionFactory,
+        protected \MageSuite\InstantPurchase\Model\OrderItemsResolver $orderItemsResolver,
         protected \Magento\Customer\Model\Session $customerSession,
         protected \Psr\Log\LoggerInterface $logger,
         protected \Magento\Framework\Message\ManagerInterface $messageManager,
@@ -46,26 +46,19 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
             return $quote;
         }
 
-        /** @var \Magento\Sales\Model\ResourceModel\Order\Item\Collection $orderItemsCollection */
-        $orderItemsCollection = $this->orderItemsCollectionFactory->create();
-
-        $orderItemsCollection->getSelect()->join(
-            ['so' => $orderItemsCollection->getResource()->getTable('sales_order')],
-            'main_table.order_id = so.entity_id',
-            ['customer_id']
-        );
-
-        $orderItemsCollection->addFieldToFilter('item_id', ['in' => array_keys($itemIds)]);
-        $orderItemsCollection->addFieldToFilter('customer_id', ['eq' => $this->customerSession->getCustomerId()]);
-
-        $orderItems = $orderItemsCollection->getItems();
-
-        if (empty($orderItems)) {
-            return $quote;
-        }
-
         if (isset($params['use_default_data'])) {
             $this->displayUserVisibleErrorMessages = (bool)$params['use_default_data'];
+        }
+
+        $orderItems = $this->orderItemsResolver->getByItemIds(
+            array_keys($itemIds),
+            (int)$this->customerSession->getCustomerId()
+        );
+
+        if (empty($orderItems)) {
+            $this->reportUnresolvedOrderItems(array_keys($itemIds));
+
+            return $quote;
         }
 
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
@@ -102,7 +95,25 @@ class UseOrderItems implements \MageSuite\InstantPurchase\Api\Service\QuoteItems
         }
     }
 
-    protected function addItemToCart( // phpcs:ignore
+    protected function reportUnresolvedOrderItems(array $itemIds): void
+    {
+        $this->logger->error(
+            sprintf(
+                'Instant purchase could not resolve any of the selected order items (%s) for customer %s',
+                implode(', ', $itemIds),
+                $this->customerSession->getCustomerId()
+            )
+        );
+
+        if (!$this->displayUserVisibleErrorMessages) {
+            return;
+        }
+
+        $this->messageManager->addErrorMessage(__('The selected products are no longer available for reorder.'));
+    }
+
+    // phpcs:ignore
+    protected function addItemToCart(
         \Magento\Sales\Api\Data\OrderItemInterface $orderItem,
         \Magento\Quote\Model\Quote $cart,
         \Magento\Catalog\Model\Product $product,
